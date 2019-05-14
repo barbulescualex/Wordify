@@ -15,6 +15,8 @@ class CharView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
+    var matrixPos : (Int, Int) = (0,0)
+    
     var highlighted = false
     var transitioning = false
     

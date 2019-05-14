@@ -8,15 +8,26 @@
 
 import UIKit
 
-public enum WordTouchState {
-    case none
-    case listening
+
+public enum Direction {
+    case horizontal
+    case vertical
+    case diagonal
+}
+
+struct Position {
+    var direction : Direction?
+    var matrixPos : (Int,Int)
 }
 
 class WordSearchView: UIView {
     var size : Int = 0
     
-    var touchState : WordTouchState = .none
+    var previousPos : Position? {
+        didSet{
+            print(previousPos)
+        }
+    }
     
     private var stackContainer : UIStackView = {
         let stackContainer = UIStackView()
@@ -66,16 +77,21 @@ class WordSearchView: UIView {
     
    func populateChars(){
         print(size)
+        var i = -1
+        var j = -1
         for _ in 0..<size {
+            j = j + 1
             let horCharStack = UIStackView()
             horCharStack.axis = .horizontal
             horCharStack.distribution = .fillEqually
             horCharStack.alignment = .center
             
             stackContainer.addArrangedSubview(horCharStack)
-            
+            i = -1
             for _ in 0..<size{
+                i = i + 1
                 let charView = CharView(char: Data.randomChars.randomElement()!)
+                charView.matrixPos = (i,j)
                 cellArray.append(charView)
                 horCharStack.addArrangedSubview(charView)
             }
@@ -105,8 +121,8 @@ class WordSearchView: UIView {
     
     var highlightedCells = [CharView](){
         didSet{
-            let arr = highlightedCells.map({ $0.char! })
-            print(arr)
+//            let arr = highlightedCells.map({ $0.char! })
+//            print(arr)
         }
     }
     
@@ -124,7 +140,6 @@ class WordSearchView: UIView {
         
         switch sender.state {
             case .began:
-                touchState = .listening
                 _ = updateHighlightForCell(cell)
             case .changed:
                 if cell != prevCell {
@@ -146,9 +161,9 @@ class WordSearchView: UIView {
         for cell in highlightedCells {
             cell.removeHighlight()
         }
-        touchState = .none
         prevCell = nil
         highlightedCells = []
+        previousPos = nil
     }
     
     fileprivate func cancelHighlight(){
@@ -156,14 +171,86 @@ class WordSearchView: UIView {
             cell.removeHighlight()
         }
         highlightedCells = []
+        previousPos = nil
     }
     
     fileprivate func updateHighlightForCell(_ cell: CharView) -> Bool{
+        //checking for overlap
         if highlightedCells.contains(cell){
-            //going backwards, end touch, clear states
             cancelHighlight()
             return false
         }
+        
+        var positionUpdated = false
+        
+        if let previousPos = previousPos { //not the starting cell
+
+            if let direction = previousPos.direction {
+                print("previous direction exists: ", direction, " candidate cell positon: ", cell.matrixPos)
+                //check for valid direction, if no valid direction return
+                switch direction {
+                case .vertical:
+                    if cell.matrixPos.0 != previousPos.matrixPos.0{
+                        return true //not in same direction
+                    } else { //same direction, check if skipped
+                        let diffY = abs(previousPos.matrixPos.1 - cell.matrixPos.1)
+                        if diffY > 1 {
+                            return true
+                        }
+                        
+                    }
+                case .horizontal:
+                    if cell.matrixPos.1 != previousPos.matrixPos.1{
+                        return true//not in same direction
+                    } else { //same direction, check if skipped
+                        let diffX = abs(previousPos.matrixPos.0 - cell.matrixPos.0)
+                        if diffX > 1 {
+                            return true
+                        }
+                    }
+                case .diagonal:
+                    if (cell.matrixPos.0 == previousPos.matrixPos.0
+                        || cell.matrixPos.1 == previousPos.matrixPos.1) {
+                        return true //not in same direction
+                    } else { //same direction, check if skipped
+                        let diffX = abs(previousPos.matrixPos.0 - cell.matrixPos.0)
+                        let diffY = abs(previousPos.matrixPos.1 - cell.matrixPos.1)
+                        
+                        if diffX != diffY {
+                            return false
+                        } else {
+                            if diffX > 1 {
+                                return true
+                            }
+                        }
+                    }
+                }
+            } else { //establish direction
+                print("no direction exists, establishing direction")
+                if cell.matrixPos.0 == previousPos.matrixPos.0 { //vertical
+                     self.previousPos = Position(direction: .vertical, matrixPos: cell.matrixPos)
+                } else if cell.matrixPos.1 == previousPos.matrixPos.1 { //horizontal
+                    self.previousPos = Position(direction: .horizontal, matrixPos: cell.matrixPos)
+                } else if ((abs(cell.matrixPos.0 - previousPos.matrixPos.0) == 1)&&(abs(cell.matrixPos.1 - previousPos.matrixPos.1) == 1)){ //horizontal
+                    self.previousPos = Position(direction: .diagonal, matrixPos: cell.matrixPos)
+                } else { //not valid direction, don't update the highlight
+                    print("no valid direction")
+                    return true
+                }
+                positionUpdated = true
+            }
+        } else { //starting cell
+            print("starting cell")
+            previousPos = Position(direction: nil, matrixPos: cell.matrixPos)
+            positionUpdated = true
+        }
+        
+        if !positionUpdated {
+            let newPosition = Position(direction: previousPos?.direction, matrixPos: cell.matrixPos)
+            print("previous position updated")
+            previousPos = newPosition
+        }
+
         highlightedCells.append(cell)
         cell.updateHighlight()
         return true
