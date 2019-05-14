@@ -1,5 +1,5 @@
 //
-//  CharView.swift
+//  CharCell.swift
 //  Wordify
 //
 //  Created by Alex Barbulescu on 2019-05-13.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CharView: UIView, UIGestureRecognizerDelegate {
+class CharCell: UIView, UIGestureRecognizerDelegate {
     var char : Character? {
         didSet{
            updateChar()

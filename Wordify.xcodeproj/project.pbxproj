@@ -13,8 +13,10 @@
 		FA1B03932289AD8C0005925F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA1B03912289AD8C0005925F /* LaunchScreen.storyboard */; };
 		FA1B039B2289AEE30005925F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B039A2289AEE30005925F /* Extensions.swift */; };
 		FA1B039F2289B8780005925F /* WordSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B039E2289B8780005925F /* WordSearchView.swift */; };
-		FA1B03A1228A419E0005925F /* CharView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B03A0228A419E0005925F /* CharView.swift */; };
+		FA1B03A1228A419E0005925F /* CharCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B03A0228A419E0005925F /* CharCell.swift */; };
 		FA1B03A3228A575F0005925F /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B03A2228A575F0005925F /* Data.swift */; };
+		FA1B03A9228B6DD10005925F /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B03A8228B6DD10005925F /* Enums.swift */; };
+		FA1B03AB228B6DE70005925F /* Structs.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B03AA228B6DE70005925F /* Structs.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,8 +28,10 @@
 		FA1B03942289AD8C0005925F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FA1B039A2289AEE30005925F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		FA1B039E2289B8780005925F /* WordSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSearchView.swift; sourceTree = "<group>"; };
-		FA1B03A0228A419E0005925F /* CharView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharView.swift; sourceTree = "<group>"; };
+		FA1B03A0228A419E0005925F /* CharCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharCell.swift; sourceTree = "<group>"; };
 		FA1B03A2228A575F0005925F /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		FA1B03A8228B6DD10005925F /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		FA1B03AA228B6DE70005925F /* Structs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Structs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,16 +65,50 @@
 			isa = PBXGroup;
 			children = (
 				FA1B03882289AD860005925F /* AppDelegate.swift */,
-				FA1B038A2289AD860005925F /* ViewController.swift */,
-				FA1B038F2289AD8C0005925F /* Assets.xcassets */,
-				FA1B03912289AD8C0005925F /* LaunchScreen.storyboard */,
-				FA1B03942289AD8C0005925F /* Info.plist */,
-				FA1B039A2289AEE30005925F /* Extensions.swift */,
-				FA1B039E2289B8780005925F /* WordSearchView.swift */,
-				FA1B03A0228A419E0005925F /* CharView.swift */,
-				FA1B03A2228A575F0005925F /* Data.swift */,
+				FA1B03A4228B6CF00005925F /* View */,
+				FA1B03A5228B6CFE0005925F /* Model */,
+				FA1B03A6228B6D080005925F /* Helpers */,
+				FA1B03A7228B6D2E0005925F /* Extras */,
 			);
 			path = Wordify;
+			sourceTree = "<group>";
+		};
+		FA1B03A4228B6CF00005925F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				FA1B038A2289AD860005925F /* ViewController.swift */,
+				FA1B039E2289B8780005925F /* WordSearchView.swift */,
+				FA1B03A0228A419E0005925F /* CharCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		FA1B03A5228B6CFE0005925F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FA1B03A2228A575F0005925F /* Data.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		FA1B03A6228B6D080005925F /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				FA1B039A2289AEE30005925F /* Extensions.swift */,
+				FA1B03A8228B6DD10005925F /* Enums.swift */,
+				FA1B03AA228B6DE70005925F /* Structs.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		FA1B03A7228B6D2E0005925F /* Extras */ = {
+			isa = PBXGroup;
+			children = (
+				FA1B03912289AD8C0005925F /* LaunchScreen.storyboard */,
+				FA1B038F2289AD8C0005925F /* Assets.xcassets */,
+				FA1B03942289AD8C0005925F /* Info.plist */,
+			);
+			path = Extras;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,11 +181,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA1B03AB228B6DE70005925F /* Structs.swift in Sources */,
 				FA1B039F2289B8780005925F /* WordSearchView.swift in Sources */,
 				FA1B03A3228A575F0005925F /* Data.swift in Sources */,
 				FA1B038B2289AD860005925F /* ViewController.swift in Sources */,
 				FA1B039B2289AEE30005925F /* Extensions.swift in Sources */,
-				FA1B03A1228A419E0005925F /* CharView.swift in Sources */,
+				FA1B03A9228B6DD10005925F /* Enums.swift in Sources */,
+				FA1B03A1228A419E0005925F /* CharCell.swift in Sources */,
 				FA1B03892289AD860005925F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,7 +328,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YB435W5MT8;
-				INFOPLIST_FILE = Wordify/Info.plist;
+				INFOPLIST_FILE = Wordify/Extras/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -306,7 +346,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YB435W5MT8;
-				INFOPLIST_FILE = Wordify/Info.plist;
+				INFOPLIST_FILE = Wordify/Extras/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
