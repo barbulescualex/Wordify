@@ -85,14 +85,14 @@ class WordSearchView: UIView {
     func deleteChars(){
         for cell in self.cellArray {
             cell.removeFromSuperview()
-//            self.animateCellOut(cell)
         }
 
         for substack in stackContainer.subviews {
             substack.removeFromSuperview()
         }
         
-        //populateChars()
+        cellArray = []
+        highlightedCells = []
     }
     
     func reloadChars(){
@@ -101,35 +101,21 @@ class WordSearchView: UIView {
         }
     }
     
-//    func animateCellIn(_ cell: CharView){
-//        cell.alpha = 0
-//        cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-//        UIView.animate(withDuration: 0.05, animations: {
-//            cell.transform = CGAffineTransform.identity
-//            cell.alpha = 1
-//        }) { (_) in
-//
-//        }
-//    }
-    
-//    func animateCellOut(_ cell: CharView){
-//        UIView.animate(withDuration: 0.05, animations: {
-//            cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-//            cell.alpha = 0
-//        }) { (_) in
-//            cell.removeFromSuperview()
-//        }
-//    }
-    
     var prevCell : CharView?
+    
+    var highlightedCells = [CharView](){
+        didSet{
+            let arr = highlightedCells.map({ $0.char! })
+            print(arr)
+        }
+    }
     
     @objc func panned(_ sender: UIPanGestureRecognizer){
         let loc = sender.location(in: self)
 
         guard let cell = self.hitTest(loc, with: nil) as? CharView else {
             //check if out of bounds
-            if (loc.y < 0 || loc.y > self.bounds.height) {
-                print("out of bounds")
+            if (loc.y < 0 || loc.y > self.bounds.height || loc.x < 0 || loc.x > self.bounds.width) {
                 checkForWord()
                 sender.cancel()
             }
@@ -139,10 +125,12 @@ class WordSearchView: UIView {
         switch sender.state {
             case .began:
                 touchState = .listening
-                cell.updateHighlight()
+                _ = updateHighlightForCell(cell)
             case .changed:
                 if cell != prevCell {
-                    cell.updateHighlight()
+                    if !updateHighlightForCell(cell) {
+                        sender.cancel()
+                    }
                 }
             case .ended:
                 checkForWord()
@@ -155,11 +143,30 @@ class WordSearchView: UIView {
     }
     
     fileprivate func checkForWord(){
-        for cell in cellArray {
+        for cell in highlightedCells {
             cell.removeHighlight()
         }
         touchState = .none
         prevCell = nil
+        highlightedCells = []
+    }
+    
+    fileprivate func cancelHighlight(){
+        for cell in highlightedCells {
+            cell.removeHighlight()
+        }
+        highlightedCells = []
+    }
+    
+    fileprivate func updateHighlightForCell(_ cell: CharView) -> Bool{
+        if highlightedCells.contains(cell){
+            //going backwards, end touch, clear states
+            cancelHighlight()
+            return false
+        }
+        highlightedCells.append(cell)
+        cell.updateHighlight()
+        return true
     }
     
 }
