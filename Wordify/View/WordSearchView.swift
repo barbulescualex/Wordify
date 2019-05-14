@@ -243,8 +243,8 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
                         || cell.matrixPos.1 == previousPos.matrixPos.1) {
                         return //not in same direction
                     } else { //same direction, check if skipped
-                        let diffX = abs(previousPos.matrixPos.0 - cell.matrixPos.0)
-                        let diffY = abs(previousPos.matrixPos.1 - cell.matrixPos.1)
+                        let diffX = previousPos.matrixPos.0 - cell.matrixPos.0
+                        let diffY = previousPos.matrixPos.1 - cell.matrixPos.1
                         
                         if diffX != diffY {
                             return
