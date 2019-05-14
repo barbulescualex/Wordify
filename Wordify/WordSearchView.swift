@@ -25,9 +25,12 @@ class WordSearchView: UIView {
     
     var previousPos : Position? {
         didSet{
-            print(previousPos)
+//            print(previousPos)
         }
     }
+    
+    var direction : Direction?
+    var highlightingBegan = false
     
     private var stackContainer : UIStackView = {
         let stackContainer = UIStackView()
@@ -140,6 +143,8 @@ class WordSearchView: UIView {
         
         switch sender.state {
             case .began:
+                calculateDirection(sender)
+                print("CALCULATED DIRECTION: ",  direction, "   ")
                 _ = updateHighlightForCell(cell)
             case .changed:
                 if cell != prevCell {
@@ -155,6 +160,30 @@ class WordSearchView: UIView {
                 print("defualted in pan recognizer for WordSearchView")
         }
         prevCell = cell
+    }
+    
+    fileprivate func calculateDirection(_ sender: UIPanGestureRecognizer){
+        if highlightingBegan { return }
+        
+        let v = sender.velocity(in: self)
+        print("Velocity: ", v)
+        
+        //check diagonal
+        if (abs(v.x) != 0 && abs(v.y) != 0){
+            //might be diagonal
+            let diffFactor = abs(v.x)/abs(v.y)
+            if (diffFactor > 0.5 && diffFactor < 1.5){
+                direction = .diagonal
+                return
+            }
+            
+        }
+        
+        if (abs(v.x) > abs(v.y)){
+            direction = .horizontal
+        } else {
+            direction = .vertical
+        }
     }
     
     fileprivate func checkForWord(){
@@ -177,8 +206,7 @@ class WordSearchView: UIView {
     fileprivate func updateHighlightForCell(_ cell: CharView) -> Bool{
         //checking for overlap
         if highlightedCells.contains(cell){
-            cancelHighlight()
-            return false
+            return true
         }
         
         var positionUpdated = false
@@ -186,7 +214,7 @@ class WordSearchView: UIView {
         if let previousPos = previousPos { //not the starting cell
 
             if let direction = previousPos.direction {
-                print("previous direction exists: ", direction, " candidate cell positon: ", cell.matrixPos)
+//                print("previous direction exists: ", direction, " candidate cell positon: ", cell.matrixPos)
                 //check for valid direction, if no valid direction return
                 switch direction {
                 case .vertical:
@@ -225,29 +253,30 @@ class WordSearchView: UIView {
                         }
                     }
                 }
-            } else { //establish direction
-                print("no direction exists, establishing direction")
-                if cell.matrixPos.0 == previousPos.matrixPos.0 { //vertical
-                     self.previousPos = Position(direction: .vertical, matrixPos: cell.matrixPos)
-                } else if cell.matrixPos.1 == previousPos.matrixPos.1 { //horizontal
-                    self.previousPos = Position(direction: .horizontal, matrixPos: cell.matrixPos)
-                } else if ((abs(cell.matrixPos.0 - previousPos.matrixPos.0) == 1)&&(abs(cell.matrixPos.1 - previousPos.matrixPos.1) == 1)){ //horizontal
-                    self.previousPos = Position(direction: .diagonal, matrixPos: cell.matrixPos)
-                } else { //not valid direction, don't update the highlight
-                    print("no valid direction")
-                    return true
-                }
-                positionUpdated = true
             }
+//            else { //establish direction
+//                print("no direction exists, establishing direction")
+//                if cell.matrixPos.0 == previousPos.matrixPos.0 { //vertical
+//                     self.previousPos = Position(direction: .vertical, matrixPos: cell.matrixPos)
+//                } else if cell.matrixPos.1 == previousPos.matrixPos.1 { //horizontal
+//                    self.previousPos = Position(direction: .horizontal, matrixPos: cell.matrixPos)
+//                } else if ((abs(cell.matrixPos.0 - previousPos.matrixPos.0) == 1)&&(abs(cell.matrixPos.1 - previousPos.matrixPos.1) == 1)){ //horizontal
+//                    self.previousPos = Position(direction: .diagonal, matrixPos: cell.matrixPos)
+//                } else { //not valid direction, don't update the highlight
+//                    print("no valid direction")
+//                    return true
+//                }
+//                positionUpdated = true
+//            }
         } else { //starting cell
-            print("starting cell")
-            previousPos = Position(direction: nil, matrixPos: cell.matrixPos)
+//            print("starting cell")
+            previousPos = Position(direction: direction, matrixPos: cell.matrixPos)
             positionUpdated = true
         }
         
         if !positionUpdated {
             let newPosition = Position(direction: previousPos?.direction, matrixPos: cell.matrixPos)
-            print("previous position updated")
+//            print("previous position updated")
             previousPos = newPosition
         }
 
