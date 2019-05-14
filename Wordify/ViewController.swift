@@ -77,21 +77,27 @@ class ViewController: UIViewController {
             self.titleLabel.alpha = 1
             self.refreshButton.alpha = 1
         }) { (_) in
-            UIView.animate(withDuration: 0.1, animations: {
-                self.wordSearchView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-                self.wordSearchView.alpha = 1
-            }, completion: { (_) in
-                UIView.animate(withDuration: 0.05, animations: {
-                    self.wordSearchView.transform = CGAffineTransform.identity
-                }, completion: { (_) in
-                    self.wordSearchView.populateChars()
-                })
-            })
+            self.reloadWordSearch()
         }
     }
     
+    fileprivate func reloadWordSearch(){
+        UIView.animate(withDuration: 0.2, animations: {
+            self.wordSearchView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            self.wordSearchView.alpha = 1
+        }, completion: { (_) in
+            UIView.animate(withDuration: 0.1, animations: {
+                self.wordSearchView.transform = CGAffineTransform.identity
+            }, completion: { (_) in
+                self.wordSearchView.deleteChars()
+                self.wordSearchView.populateChars()
+            })
+        })
+    }
+    
     @objc func refreshPressed(_ sender: UIButton?){
-        wordSearchView.deleteChars()
+        
+        reloadWordSearch()
     }
 
 }

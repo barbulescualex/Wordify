@@ -76,14 +76,15 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     
     func deleteChars(){
         for cell in self.cellArray {
-            self.animateCellOut(cell)
+            cell.removeFromSuperview()
+//            self.animateCellOut(cell)
         }
 
         for substack in stackContainer.subviews {
             substack.removeFromSuperview()
         }
         
-        populateChars()
+        //populateChars()
     }
     
     func animateCellIn(_ cell: CharView){
