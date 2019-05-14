@@ -10,7 +10,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var titleLabel : UILabel = {
+    //MARK: View Components
+    private var titleLabel : UILabel = {
         let label = UILabel()
         label.text = "Wordify"
         label.font = UIFont.systemFont(ofSize: 30, weight: .heavy)
@@ -20,7 +21,7 @@ class ViewController: UIViewController {
         return label
     }()
     
-    lazy var refreshButton : UIButton = {
+    private lazy var refreshButton : UIButton = {
         let button = UIButton()
         button.setTitle("refresh", for: .normal)
         button.setTitleColor(UIColor.offWhite, for: .normal)
@@ -31,8 +32,13 @@ class ViewController: UIViewController {
         return button
     }()
     
-    var wordSearchView = WordSearchView(size: 10)
+    private var wordSearchView : WordSearchView = {
+        let view = WordSearchView(size: 10)
+        view.alpha = 0
+        return view
+    }()
     
+    //MARK: Init
     required init(){
         super.init(nibName: nil, bundle: nil)
         setup()
@@ -42,19 +48,22 @@ class ViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         animateIn()
     }
     
+    //MARK: Setup
     fileprivate func setup(){
         view.backgroundColor = UIColor.highlight
         
+        //add subviews
         view.addSubview(titleLabel)
         view.addSubview(refreshButton)
         view.addSubview(wordSearchView)
-        wordSearchView.alpha = 0
         
+        //add constraints
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
@@ -72,6 +81,7 @@ class ViewController: UIViewController {
         
     }
     
+    /// fades views in on viewDidLoad
     fileprivate func animateIn(){
         UIView.animate(withDuration: 0.1, animations: {
             self.titleLabel.alpha = 1
@@ -81,6 +91,7 @@ class ViewController: UIViewController {
         }
     }
     
+    /// pops word search view and either populates chars for the first time or reloads them
     fileprivate func reloadWordSearch(first: Bool){
         UIView.animate(withDuration: 0.2, animations: {
             self.wordSearchView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
@@ -98,7 +109,8 @@ class ViewController: UIViewController {
         })
     }
     
-    @objc func refreshPressed(_ sender: UIButton?){
+    /// handler for refresh button, reloads the words search
+    @objc fileprivate func refreshPressed(_ sender: UIButton?){
         reloadWordSearch(first: false)
     }
 

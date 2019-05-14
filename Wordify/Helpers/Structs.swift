@@ -8,7 +8,8 @@
 
 import Foundation
 
-struct Position {
+///Specifies the positon of an object inside a matrix and the direction it was highlighted in
+public struct Position {
     var direction : Direction?
     var matrixPos : (Int,Int)
 }
