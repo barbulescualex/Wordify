@@ -8,8 +8,15 @@
 
 import UIKit
 
-class WordSearchView: UIView, UIGestureRecognizerDelegate {
+public enum WordTouchState {
+    case none
+    case listening
+}
+
+class WordSearchView: UIView {
     var size : Int = 0
+    
+    var touchState : WordTouchState = .none
     
     private var stackContainer : UIStackView = {
         let stackContainer = UIStackView()
@@ -51,6 +58,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         
         let panRecgonizer = UIPanGestureRecognizer(target: self, action: #selector(panned(_:)))
         panRecgonizer.delegate = self
+        panRecgonizer.maximumNumberOfTouches = 1
         addGestureRecognizer(panRecgonizer)
     }
     
@@ -87,48 +95,62 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         //populateChars()
     }
     
-    func animateCellIn(_ cell: CharView){
-        cell.alpha = 0
-        cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        UIView.animate(withDuration: 0.05, animations: {
-            cell.transform = CGAffineTransform.identity
-            cell.alpha = 1
-        }) { (_) in
-            
+    func reloadChars(){
+        for cell in self.cellArray {
+            cell.char = Data.randomChars.randomElement()
         }
     }
     
-    func animateCellOut(_ cell: CharView){
-        UIView.animate(withDuration: 0.05, animations: {
-            cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            cell.alpha = 0
-        }) { (_) in
-            cell.removeFromSuperview()
-        }
-    }
+//    func animateCellIn(_ cell: CharView){
+//        cell.alpha = 0
+//        cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//        UIView.animate(withDuration: 0.05, animations: {
+//            cell.transform = CGAffineTransform.identity
+//            cell.alpha = 1
+//        }) { (_) in
+//
+//        }
+//    }
+    
+//    func animateCellOut(_ cell: CharView){
+//        UIView.animate(withDuration: 0.05, animations: {
+//            cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//            cell.alpha = 0
+//        }) { (_) in
+//            cell.removeFromSuperview()
+//        }
+//    }
     
     var prevCell : CharView?
     
     @objc func panned(_ sender: UIPanGestureRecognizer){
         let loc = sender.location(in: self)
-        guard let cell = self.hitTest(loc, with: nil) as? CharView else {return}
-        
-        
-        switch sender.state {
-        case .began:
-            print("began")
-            cell.updateHighlight()
-        case .changed:
-            if cell != prevCell {
-                cell.updateHighlight()
+
+        guard let cell = self.hitTest(loc, with: nil) as? CharView else {
+            //check if out of bounds
+            if (loc.y < 0 || loc.y > self.bounds.height) {
+                print("out of bounds")
+                checkForWord()
+                sender.cancel()
             }
-        case .ended:
-            print("ended")
-            checkForWord()
-        default:
-            print("defualted in pan recognizer for WordSearchView")
+            return
         }
         
+        switch sender.state {
+            case .began:
+                touchState = .listening
+                cell.updateHighlight()
+            case .changed:
+                if cell != prevCell {
+                    cell.updateHighlight()
+                }
+            case .ended:
+                checkForWord()
+            case .cancelled:
+                checkForWord()
+            default:
+                print("defualted in pan recognizer for WordSearchView")
+        }
         prevCell = cell
     }
     
@@ -136,6 +158,12 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         for cell in cellArray {
             cell.removeHighlight()
         }
+        touchState = .none
+        prevCell = nil
     }
+    
+}
+
+extension WordSearchView : UIGestureRecognizerDelegate {
     
 }
