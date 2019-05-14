@@ -16,20 +16,22 @@ class ViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 30, weight: .heavy)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.alpha = 0
-        label.textColor = UIColor.black
+        label.textColor = UIColor.offWhite
         return label
     }()
     
     lazy var refreshButton : UIButton = {
         let button = UIButton()
         button.setTitle("refresh", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(UIColor.offWhite, for: .normal)
         button.setTitleColor(UIColor.highlight, for: .highlighted)
         button.alpha = 0
         button.addTarget(self, action: #selector(refreshPressed(_:)), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    var wordSearchView = WordSearchView(size: 10)
     
     required init(){
         super.init(nibName: nil, bundle: nil)
@@ -46,29 +48,50 @@ class ViewController: UIViewController {
     }
     
     fileprivate func setup(){
-        view.backgroundColor = UIColor.offWhite
+        view.backgroundColor = UIColor.highlight
         
         view.addSubview(titleLabel)
         view.addSubview(refreshButton)
+        view.addSubview(wordSearchView)
+        wordSearchView.alpha = 0
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
             
             refreshButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            refreshButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5)
+            refreshButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            
+            
+            wordSearchView.widthAnchor.constraint(equalTo: wordSearchView.heightAnchor),
+            wordSearchView.heightAnchor.constraint(equalTo: wordSearchView.widthAnchor),
+            wordSearchView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            wordSearchView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            wordSearchView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+        
     }
     
     fileprivate func animateIn(){
-        UIView.animate(withDuration: 0.3) { [weak self] in
-            self?.titleLabel.alpha = 1
-            self?.refreshButton.alpha = 1
+        UIView.animate(withDuration: 0.1, animations: {
+            self.titleLabel.alpha = 1
+            self.refreshButton.alpha = 1
+        }) { (_) in
+            UIView.animate(withDuration: 0.1, animations: {
+                self.wordSearchView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+                self.wordSearchView.alpha = 1
+            }, completion: { (_) in
+                UIView.animate(withDuration: 0.05, animations: {
+                    self.wordSearchView.transform = CGAffineTransform.identity
+                }, completion: { (_) in
+                    self.wordSearchView.populateChars()
+                })
+            })
         }
     }
     
     @objc func refreshPressed(_ sender: UIButton?){
-        
+        wordSearchView.deleteChars()
     }
 
 }

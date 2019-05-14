@@ -13,6 +13,8 @@
 		FA1B03932289AD8C0005925F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA1B03912289AD8C0005925F /* LaunchScreen.storyboard */; };
 		FA1B039B2289AEE30005925F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B039A2289AEE30005925F /* Extensions.swift */; };
 		FA1B039F2289B8780005925F /* WordSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B039E2289B8780005925F /* WordSearchView.swift */; };
+		FA1B03A1228A419E0005925F /* CharView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B03A0228A419E0005925F /* CharView.swift */; };
+		FA1B03A3228A575F0005925F /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B03A2228A575F0005925F /* Data.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		FA1B03942289AD8C0005925F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FA1B039A2289AEE30005925F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		FA1B039E2289B8780005925F /* WordSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSearchView.swift; sourceTree = "<group>"; };
+		FA1B03A0228A419E0005925F /* CharView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharView.swift; sourceTree = "<group>"; };
+		FA1B03A2228A575F0005925F /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +67,8 @@
 				FA1B03942289AD8C0005925F /* Info.plist */,
 				FA1B039A2289AEE30005925F /* Extensions.swift */,
 				FA1B039E2289B8780005925F /* WordSearchView.swift */,
+				FA1B03A0228A419E0005925F /* CharView.swift */,
+				FA1B03A2228A575F0005925F /* Data.swift */,
 			);
 			path = Wordify;
 			sourceTree = "<group>";
@@ -138,8 +144,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA1B039F2289B8780005925F /* WordSearchView.swift in Sources */,
+				FA1B03A3228A575F0005925F /* Data.swift in Sources */,
 				FA1B038B2289AD860005925F /* ViewController.swift in Sources */,
 				FA1B039B2289AEE30005925F /* Extensions.swift in Sources */,
+				FA1B03A1228A419E0005925F /* CharView.swift in Sources */,
 				FA1B03892289AD860005925F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
