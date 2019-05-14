@@ -22,10 +22,10 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     var matrixPos : (Int, Int) = (0,0)
     
     ///boolean flag to check if it is in a highlighted state
-    var highlighted = false
+    private(set) var highlighted = false
     
-    ///boolean flag to check that it's not currently transitioning between states
-    var transitioning = false
+    //boolean flag to indify that this cell was part of a valid and found string
+    private(set) var solidified = false
     
     //Mark: View Components
     private var charLabel : UILabel = {
@@ -39,7 +39,7 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     }()
     
     //MARK: Init
-    required init(char: Character){
+    required init(char: Character?){
         self.char = char
         super.init(frame: .zero)
         setup()
@@ -75,6 +75,8 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
         layer.borderColor = UIColor.clear.cgColor
     }
     
+    //MARK: State Functions
+    
     ///updates the char in the charLabel to the value the instance variable "char"
     fileprivate func updateChar(){
         if let char = char {
@@ -84,35 +86,39 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    ///flips the highlight state
-    public func updateHighlight(){
-        if transitioning { return }
-        transitioning = true
-        
-        if highlighted {
-            UIView.animate(withDuration: 0.1) {[weak self] in
-                self?.charLabel.textColor = UIColor.gray
-                self?.backgroundColor = UIColor.clear
-            }
-            highlighted = false
-        } else {
-            UIView.animate(withDuration: 0.1) {[weak self] in
-                self?.charLabel.textColor = UIColor.white
-                self?.backgroundColor = UIColor.highlight
-            }
-            highlighted = true
+    ///sets highlight state
+    public func addHighlight(){
+        UIView.animate(withDuration: 0.1) {
+            self.charLabel.textColor = UIColor.white
+            self.backgroundColor = UIColor.highlight
         }
-        transitioning = false
+        highlighted = true
     }
     
     ///removes the highlight state
     public func removeHighlight(){
         if highlighted {
-            UIView.animate(withDuration: 0.1) {[weak self] in
-                self?.charLabel.textColor = UIColor.gray
-                self?.backgroundColor = UIColor.clear
+            UIView.animate(withDuration: 0.1) {
+                self.charLabel.textColor = self.solidified ? UIColor.white : UIColor.gray
+                self.backgroundColor = self.solidified ? UIColor.lightGray : UIColor.clear
             }
             highlighted = false
         }
+    }
+    
+    ///resets all state
+    public func reset(){
+        
+    }
+    
+    ///sets cell soldify state
+    public func solidify(){
+        if solidified {return}
+        solidified = true
+        UIView.animate(withDuration: 0.1) {
+            self.charLabel.textColor = UIColor.white
+            self.backgroundColor = UIColor.lightGray
+        }
+        highlighted = false
     }
 }

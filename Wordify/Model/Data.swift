@@ -6,10 +6,9 @@
 //  Copyright © 2019 ca.alexs. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
-class Data: UIView {
-    static let randomChars = "abcdefghijklmnopqrstuvwxyz"
+class Data {
     static let words = [
         "swift",
         "kotlin",
@@ -20,4 +19,9 @@ class Data: UIView {
         "shopify",
         "ios"
     ]
+    
+    static var randomChar : Character? {
+        let randomChars = "abcdefghijklmnopqrstuvwxyz"
+        return randomChars.randomElement()
+    }
 }

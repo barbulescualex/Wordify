@@ -81,6 +81,8 @@ class ViewController: UIViewController {
         
     }
     
+    //MARK: Animations
+    
     /// fades views in on viewDidLoad
     fileprivate func animateIn(){
         UIView.animate(withDuration: 0.1, animations: {
@@ -108,6 +110,8 @@ class ViewController: UIViewController {
             })
         })
     }
+    
+    //MARK: Event Handlers
     
     /// handler for refresh button, reloads the words search
     @objc fileprivate func refreshPressed(_ sender: UIButton?){

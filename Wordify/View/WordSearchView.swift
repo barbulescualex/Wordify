@@ -85,7 +85,6 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     ///populates chars and sets up grid
     ///- Warning: Call only once, does not delete current grid view components
     public func populateChars(){
-        print(size)
         var i = -1
         var j = -1
         for _ in 0..<size {
@@ -99,12 +98,13 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
             i = -1
             for _ in 0..<size{
                 i = i + 1
-                let charView = CharCell(char: Data.randomChars.randomElement()!)
+                let charView = CharCell(char: nil)
                 charView.matrixPos = (i,j)
                 cellArray.append(charView)
                 horCharStack.addArrangedSubview(charView)
             }
         }
+        Grid().populateGrid(sideLength: size, wordSet: Data.words, cellArray: cellArray)
     }
     
     ///deletes all chars and view componenets of grid
@@ -124,7 +124,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     ///reloads the word search
     public func reloadChars(){
         for cell in self.cellArray {
-            cell.char = Data.randomChars.randomElement()
+            cell.char = Data.randomChar
         }
     }
 
@@ -185,9 +185,20 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     
     ///Checks the highlightedChars array to see if it forms a valid word
     fileprivate func checkForWord(){
-        for cell in highlightedCells {
-            cell.removeHighlight()
+        let charArray = highlightedCells.map({$0.char!})
+        let candidateWord = String(charArray)
+        print(candidateWord)
+        
+        if Data.words.contains(candidateWord){
+            for cell in highlightedCells {
+                cell.solidify()
+            }
+        } else {
+            for cell in highlightedCells {
+                cell.removeHighlight()
+            }
         }
+        
         prevCell = nil
         highlightedCells = []
         previousPos = nil
@@ -267,7 +278,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         }
 
         highlightedCells.append(cell)
-        cell.updateHighlight()
+        cell.addHighlight()
         return
     }
     
