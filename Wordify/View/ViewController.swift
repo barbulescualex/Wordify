@@ -133,6 +133,7 @@ class ViewController: UIViewController {
     /// handler for refresh button, reloads the words search
     @objc fileprivate func refreshPressed(_ sender: UIButton?){
         reloadWordSearch(first: false)
+        wordSelectorView.reset()
     }
 
 }

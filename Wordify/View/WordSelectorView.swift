@@ -68,6 +68,11 @@ class WordSelectorView: UIView {
         data.remove(at: index)
         collectionView.reloadData()
     }
+    
+    public func reset(){
+        data = Data.words
+        collectionView.reloadData()
+    }
 
 }
 

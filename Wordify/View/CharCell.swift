@@ -84,6 +84,7 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
         } else {
             charLabel.text = nil
         }
+        reset()
     }
     
     ///sets highlight state
@@ -99,7 +100,7 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     public func removeHighlight(){
         if highlighted {
             UIView.animate(withDuration: 0.1) {
-                self.charLabel.textColor = self.solidified ? UIColor.white : UIColor.gray
+                self.charLabel.textColor = self.solidified ? UIColor.offWhite : UIColor.gray
                 self.backgroundColor = self.solidified ? UIColor.lightGray : UIColor.clear
             }
             highlighted = false
@@ -108,7 +109,14 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     
     ///resets all state
     public func reset(){
-        
+        //clear state
+        if !(solidified || highlighted) {return}
+        UIView.animate(withDuration: 0.1) {
+            self.charLabel.textColor = UIColor.gray
+            self.backgroundColor =  UIColor.clear
+        }
+        solidified = false
+        highlighted = false
     }
     
     ///sets cell soldify state
@@ -128,7 +136,7 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
             self.backgroundColor = UIColor.highlight.withAlphaComponent(0.5)
         }){_ in
             UIView.animate(withDuration: 0.2, animations: {
-                self.charLabel.textColor = self.solidified ? UIColor.white : UIColor.gray
+                self.charLabel.textColor = self.solidified ? UIColor.offWhite : UIColor.gray
                 self.backgroundColor = self.solidified ? UIColor.lightGray : UIColor.clear
             })
         }
