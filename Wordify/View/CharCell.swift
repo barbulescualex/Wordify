@@ -121,4 +121,16 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
         }
         highlighted = false
     }
+    
+    public func show(){
+        UIView.animate(withDuration: 0.3, animations: {
+            self.charLabel.textColor = UIColor.white
+            self.backgroundColor = UIColor.highlight.withAlphaComponent(0.5)
+        }){_ in
+            UIView.animate(withDuration: 0.2, animations: {
+                self.charLabel.textColor = self.solidified ? UIColor.white : UIColor.gray
+                self.backgroundColor = self.solidified ? UIColor.lightGray : UIColor.clear
+            })
+        }
+    }
 }

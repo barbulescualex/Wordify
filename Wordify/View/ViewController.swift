@@ -38,6 +38,13 @@ class ViewController: UIViewController {
         return view
     }()
     
+    private lazy var wordSelectorView : WordSelectorView = {
+        let view = WordSelectorView()
+        view.alpha = 0
+        view.delegate = self
+        return view
+    }()
+    
     //MARK: Init
     required init(){
         super.init(nibName: nil, bundle: nil)
@@ -53,7 +60,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         animateIn()
     }
-    
+
     //MARK: Setup
     fileprivate func setup(){
         view.backgroundColor = UIColor.highlight
@@ -62,6 +69,7 @@ class ViewController: UIViewController {
         view.addSubview(titleLabel)
         view.addSubview(refreshButton)
         view.addSubview(wordSearchView)
+        view.addSubview(wordSelectorView)
         
         //add constraints
         NSLayoutConstraint.activate([
@@ -74,9 +82,14 @@ class ViewController: UIViewController {
             
             wordSearchView.widthAnchor.constraint(equalTo: wordSearchView.heightAnchor),
             wordSearchView.heightAnchor.constraint(equalTo: wordSearchView.widthAnchor),
-            wordSearchView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            wordSearchView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            wordSearchView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            wordSearchView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            wordSearchView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            wordSearchView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            
+            wordSelectorView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            wordSelectorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            wordSelectorView.heightAnchor.constraint(equalToConstant: 100),
+            wordSelectorView.topAnchor.constraint(equalTo: wordSearchView.bottomAnchor),
         ])
         
     }
@@ -101,6 +114,9 @@ class ViewController: UIViewController {
         }, completion: { (_) in
             UIView.animate(withDuration: 0.1, animations: {
                 self.wordSearchView.transform = CGAffineTransform.identity
+                if first {
+                    self.wordSelectorView.alpha = 1
+                }
             }, completion: { (_) in
                 if first {
                     self.wordSearchView.populateChars()
@@ -120,3 +136,10 @@ class ViewController: UIViewController {
 
 }
 
+extension ViewController: WordSelectorViewDelegate {
+    func showWord(word: String?) {
+        guard let word = word else {return}
+        print(word)
+        wordSearchView.showWord(named: word)
+    }
+}

@@ -30,6 +30,9 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     ///The highlighted, valid, char cells in order of selection
     var highlightedCells = [CharCell]()
     
+    ///Reference to all the words in the grid
+    var words = [Word]()
+    
     //MARK: View Components
     private var stackContainer : UIStackView = {
         let stackContainer = UIStackView()
@@ -104,7 +107,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
                 horCharStack.addArrangedSubview(charView)
             }
         }
-        Grid().populateGrid(sideLength: size, wordSet: Data.words, cellArray: cellArray)
+        words = Grid().populateGrid(sideLength: size, wordSet: Data.words, cellArray: cellArray)
     }
     
     ///deletes all chars and view componenets of grid
@@ -123,9 +126,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     
     ///reloads the word search
     public func reloadChars(){
-        for cell in self.cellArray {
-            cell.char = Data.randomChar
-        }
+       words = Grid().populateGrid(sideLength: size, wordSet: Data.words, cellArray: cellArray)
     }
 
 
@@ -173,7 +174,6 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
                 direction = .diagonal
                 return
             }
-            
         }
         
         if (abs(v.x) > abs(v.y)){
@@ -212,6 +212,18 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         highlightedCells = []
         prevCell = nil
         previousPos = nil
+    }
+    
+    
+    public func showWord(named: String){
+        print(words)
+        for word in words {
+            if word.string == named {
+                for cell in word.cells {
+                    cell.show()
+                }
+            }
+        }
     }
     
     ///Gets called from the pan gesture recognizer if a new cell was selected, this function
