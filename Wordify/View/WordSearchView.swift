@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol WordSearchViewDelegate: AnyObject {
+    func foundWord(word: Word)
+}
+
 class WordSearchView: UIView, UIGestureRecognizerDelegate {
     //MARK: Vars
     
@@ -32,6 +36,8 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     
     ///Reference to all the words in the grid
     var words = [Word]()
+    
+    weak var delegate : WordSearchViewDelegate?
     
     //MARK: View Components
     private var stackContainer : UIStackView = {
@@ -189,11 +195,19 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         let candidateWord = String(charArray)
         print(candidateWord)
         
-        if Data.words.contains(candidateWord){
-            for cell in highlightedCells {
-                cell.solidify()
+        var found = false
+        
+        for word in words {
+            if word.string == candidateWord {
+                found = true
+                for cell in word.cells {
+                    cell.solidify()
+                }
+                delegate?.foundWord(word: word)
             }
-        } else {
+        }
+        
+        if !found {
             for cell in highlightedCells {
                 cell.removeHighlight()
             }

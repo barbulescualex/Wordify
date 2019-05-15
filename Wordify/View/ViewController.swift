@@ -32,9 +32,10 @@ class ViewController: UIViewController {
         return button
     }()
     
-    private var wordSearchView : WordSearchView = {
+    private lazy var wordSearchView : WordSearchView = {
         let view = WordSearchView(size: 10)
         view.alpha = 0
+        view.delegate = self
         return view
     }()
     
@@ -141,5 +142,11 @@ extension ViewController: WordSelectorViewDelegate {
         guard let word = word else {return}
         print(word)
         wordSearchView.showWord(named: word)
+    }
+}
+
+extension ViewController: WordSearchViewDelegate {
+    func foundWord(word: Word) {
+        wordSelectorView.removeWordFromSelection(word: word)
     }
 }

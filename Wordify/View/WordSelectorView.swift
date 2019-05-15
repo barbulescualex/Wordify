@@ -15,6 +15,8 @@ protocol WordSelectorViewDelegate : AnyObject {
 class WordSelectorView: UIView {
     private let id = "cell"
     
+    private var data = Data.words
+    
     public lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 10
@@ -60,6 +62,12 @@ class WordSelectorView: UIView {
         ])
 
     }
+    
+    public func removeWordFromSelection(word: Word){
+        guard let index = data.firstIndex(of: word.string) else {return}
+        data.remove(at: index)
+        collectionView.reloadData()
+    }
 
 }
 
@@ -70,12 +78,12 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return Data.words.count
+        return data.count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! SelectorCell
-        cell.word = Data.words[indexPath.item]
+        cell.word = data[indexPath.item]
         cell.delegate = self
         return cell
     }
