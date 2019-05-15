@@ -23,9 +23,9 @@ class ViewController: UIViewController {
     
     private lazy var refreshButton : UIButton = {
         let button = UIButton()
-        button.setTitle("refresh", for: .normal)
-        button.setTitleColor(UIColor.offWhite, for: .normal)
-        button.setTitleColor(UIColor.highlight, for: .highlighted)
+//        button.setTitle("refresh", for: .normal)
+        button.setImage(UIImage(named: "refresh")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = UIColor.offWhite
         button.alpha = 0
         button.addTarget(self, action: #selector(refreshPressed(_:)), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -141,7 +141,6 @@ class ViewController: UIViewController {
 extension ViewController: WordSelectorViewDelegate {
     func showWord(word: String?) {
         guard let word = word else {return}
-        print(word)
         wordSearchView.showWord(named: word)
     }
 }

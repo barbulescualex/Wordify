@@ -52,7 +52,6 @@ class WordSelectorView: UIView {
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(collectionView)
         
-        
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
