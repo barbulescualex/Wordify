@@ -193,12 +193,13 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     fileprivate func checkForWord(){
         let charArray = highlightedCells.map({$0.char!})
         let candidateWord = String(charArray)
+        let reversedCandidateWord = String(candidateWord.reversed())
         print(candidateWord)
         
         var found = false
         
         for word in words {
-            if word.string == candidateWord {
+            if word.string == candidateWord || word.string == reversedCandidateWord {
                 found = true
                 for cell in word.cells {
                     cell.solidify()
