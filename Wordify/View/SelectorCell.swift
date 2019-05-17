@@ -8,10 +8,6 @@
 
 import UIKit
 
-protocol SelectorCellDelegate : AnyObject {
-    func tapped(sender: SelectorCell)
-}
-
 class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     public var word: String? {
         didSet{
@@ -28,23 +24,16 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         return label
     }()
     
-    weak var delegate : SelectorCellDelegate?
-    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
-        tap.delegate = self
-        addGestureRecognizer(tap)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc private func tapped(){
-        delegate?.tapped(sender: self)
+    public func tapped(){
         UIView.animate(withDuration: 0.1, animations: {
             self.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
         }){ _ in

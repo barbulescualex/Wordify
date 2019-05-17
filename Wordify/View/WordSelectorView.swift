@@ -17,17 +17,22 @@ class WordSelectorView: UIView {
     
     private var data = Data.words
     
-    public lazy var collectionView : UICollectionView = {
+    public var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 15
         layout.scrollDirection = .horizontal
+        return layout
+    }()
+    
+    public lazy var collectionView : UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isScrollEnabled = true
         collectionView.alwaysBounceHorizontal = true
+        collectionView.alwaysBounceVertical = false
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.allowsMultipleSelection = true
@@ -59,7 +64,6 @@ class WordSelectorView: UIView {
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
 
         ])
-
     }
     
     public func removeWordFromSelection(word: Word){
@@ -72,10 +76,23 @@ class WordSelectorView: UIView {
         data = Data.words
         collectionView.reloadData()
     }
+    
+    public func updateScrollDirection(direction : UICollectionView.ScrollDirection){
+        layout.scrollDirection = direction
+        
+        switch direction {
+        case .horizontal:
+            collectionView.alwaysBounceVertical = false
+            collectionView.alwaysBounceHorizontal = true
+        case .vertical:
+            collectionView.alwaysBounceVertical = true
+            collectionView.alwaysBounceHorizontal = false
+        }
+    }
 
 }
 
-extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource, SelectorCellDelegate, UICollectionViewDelegateFlowLayout{
+extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
     //population
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
@@ -88,15 +105,17 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! SelectorCell
         cell.word = data[indexPath.item]
-        cell.delegate = self
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? SelectorCell else { return }
+        delegate?.showWord(word: cell.word)
     }
     
     //sizing
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = CGFloat(100)
-        let height = CGFloat(50)
-        return CGSize(width: width, height: height)
+        return CGSize(width: 90, height: 50)
     }
     
     func tapped(sender: SelectorCell) {

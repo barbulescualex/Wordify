@@ -21,3 +21,13 @@ extension UIGestureRecognizer {
         isEnabled = true
     }
 }
+
+extension UIViewController {
+    func isLandscape() -> Bool {
+        return (self.view.frame.height < self.view.frame.width)
+    }
+    
+    func isPortrait() -> Bool {
+        return (self.view.frame.height > self.view.frame.width)
+    }
+}
