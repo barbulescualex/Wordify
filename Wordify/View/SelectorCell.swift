@@ -31,7 +31,6 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     weak var delegate : SelectorCellDelegate?
     
     public override init(frame: CGRect) {
-        print(frame)
         super.init(frame: frame)
         setup()
         

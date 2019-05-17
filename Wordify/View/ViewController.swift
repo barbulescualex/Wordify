@@ -23,7 +23,6 @@ class ViewController: UIViewController {
     
     private lazy var refreshButton : UIButton = {
         let button = UIButton()
-//        button.setTitle("refresh", for: .normal)
         button.setImage(UIImage(named: "refresh")?.withRenderingMode(.alwaysTemplate), for: .normal)
         button.tintColor = UIColor.offWhite
         button.alpha = 0
@@ -49,7 +48,9 @@ class ViewController: UIViewController {
     //MARK: Init
     required init(){
         super.init(nibName: nil, bundle: nil)
+        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         setup()
+        setupConstraints()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -60,6 +61,10 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         animateIn()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        print("did layout")
     }
 
     //MARK: Setup
@@ -72,27 +77,59 @@ class ViewController: UIViewController {
         view.addSubview(wordSearchView)
         view.addSubview(wordSelectorView)
         
-        //add constraints
-        NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
-            
-            refreshButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            refreshButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
-            
-            
-            wordSearchView.widthAnchor.constraint(equalTo: wordSearchView.heightAnchor),
-            wordSearchView.heightAnchor.constraint(equalTo: wordSearchView.widthAnchor),
-            wordSearchView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            wordSearchView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            wordSearchView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            
-            wordSelectorView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            wordSelectorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            wordSelectorView.heightAnchor.constraint(equalToConstant: 100),
-            wordSelectorView.topAnchor.constraint(equalTo: wordSearchView.bottomAnchor),
-        ])
+        NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
         
+    }
+    
+    @objc fileprivate func orientationChanged(){
+        setupConstraints()
+    }
+    
+    fileprivate func setupConstraints(){
+        //add constraints
+        if UIDevice.current.orientation.isLandscape {
+            print("landscape")
+            NSLayoutConstraint.activate([
+                titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+                
+                refreshButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                refreshButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+                
+                
+                wordSearchView.widthAnchor.constraint(equalTo: wordSearchView.heightAnchor),
+                wordSearchView.heightAnchor.constraint(equalTo: wordSearchView.widthAnchor),
+                wordSearchView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+                wordSearchView.bottomAnchor.constraint(equalTo: wordSelectorView.topAnchor),
+                
+                wordSelectorView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                wordSelectorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+                wordSelectorView.heightAnchor.constraint(equalToConstant: 60),
+                wordSelectorView.topAnchor.constraint(equalTo: wordSearchView.bottomAnchor),
+                wordSelectorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+                ])
+        } else {
+            NSLayoutConstraint.activate([
+                titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+                
+                refreshButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                refreshButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+                
+                
+                wordSearchView.widthAnchor.constraint(equalTo: wordSearchView.heightAnchor),
+                wordSearchView.heightAnchor.constraint(equalTo: wordSearchView.widthAnchor),
+                wordSearchView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+                wordSearchView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                wordSearchView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+                
+                wordSelectorView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                wordSelectorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+                wordSelectorView.heightAnchor.constraint(equalToConstant: 100),
+                wordSelectorView.topAnchor.constraint(equalTo: wordSearchView.bottomAnchor),
+            ])
+        }
+
     }
     
     //MARK: Animations
@@ -133,7 +170,9 @@ class ViewController: UIViewController {
     /// handler for refresh button, reloads the words search
     @objc fileprivate func refreshPressed(_ sender: UIButton?){
         reloadWordSearch(first: false)
-        wordSelectorView.reset()
+//        if !first {
+            self.wordSelectorView.reset()
+//        }
     }
 
 }

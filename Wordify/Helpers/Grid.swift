@@ -27,7 +27,7 @@ class Grid{
         let charArray = string.map({$0})
         let size = charArray.count
         if wordsIn == 0 { //first word
-            var word = Word(string: string, cells: [])
+            var word = Word(string: string, cells: [], found: false)
             if size < sideLength {
                 for i in 0..<size {
                     cellArray[i].char = charArray[i]

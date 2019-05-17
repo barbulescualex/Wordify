@@ -132,7 +132,10 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     
     ///reloads the word search
     public func reloadChars(){
-       words = Grid().populateGrid(sideLength: size, wordSet: Data.words, cellArray: cellArray)
+        for cell in self.cellArray {
+            cell.char = nil
+        }
+        words = Grid().populateGrid(sideLength: size, wordSet: Data.words, cellArray: cellArray)
     }
 
 
@@ -197,9 +200,12 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         
         var found = false
         
-        for word in words {
-            if word.string == candidateWord || word.string == reversedCandidateWord {
+        for (i,word) in words.enumerated() {
+            if ( word.string == candidateWord || word.string == reversedCandidateWord ) && !word.found {
                 found = true
+                words[i].found = true
+                print(word)
+                print("Found word: ", word.string)
                 for cell in word.cells {
                     cell.solidify()
                 }

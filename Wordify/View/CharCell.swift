@@ -98,13 +98,13 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     
     ///removes the highlight state
     public func removeHighlight(){
-        if highlighted {
+//        if highlighted {
             UIView.animate(withDuration: 0.1) {
                 self.charLabel.textColor = self.solidified ? UIColor.offWhite : UIColor.gray
                 self.backgroundColor = self.solidified ? UIColor.lightGray : UIColor.clear
             }
             highlighted = false
-        }
+//        }
     }
     
     ///resets all state

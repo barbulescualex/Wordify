@@ -18,4 +18,5 @@ public struct Position {
 public struct Word {
     var string : String
     var cells : [CharCell]
+    var found = false
 }
