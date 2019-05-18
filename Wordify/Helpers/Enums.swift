@@ -12,5 +12,7 @@ import Foundation
 public enum Direction {
     case horizontal
     case vertical
-    case diagonal
+//    case diagonal
+    case diagonal_TL_BR //inbetween top left and bottom right
+    case diagonal_TR_BL //inbetween top right and bottom left
 }

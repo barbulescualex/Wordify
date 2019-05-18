@@ -145,7 +145,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
 
         guard let cell = self.hitTest(loc, with: nil) as? CharCell else {
             //check if out of bounds
-            if (loc.y < 0 || loc.y > self.bounds.height || loc.x < 0 || loc.x > self.bounds.width) {
+            if (loc.y < 0 || loc.y > self.bounds.height || loc.x < 5 || loc.x > self.bounds.width - 5) {
                 checkForWord()
                 sender.cancel()
             }
@@ -177,10 +177,13 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         
         //check diagonal
         if (abs(v.x) != 0 && abs(v.y) != 0){
-            //might be diagonal
             let diffFactor = abs(v.x)/abs(v.y)
-            if (diffFactor > 0.5 && diffFactor < 1.5){
-                direction = .diagonal
+            if (diffFactor > 0.5 && diffFactor < 1.5){ //might be diagonal
+                if (v.y < 0 && v.x < 0) || (v.y > 0 && v.x > 0) {
+                    direction = .diagonal_TL_BR //velocity is from top left to bottom right or vice versa
+                } else { //opposing x and y direction
+                    direction = .diagonal_TR_BL // velocity is from top right to bottom left or vice versa
+                }
                 return
             }
         }
@@ -205,7 +208,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
                 found = true
                 words[i].found = true
                 print(word)
-                print("Found word: ", word.string)
+//                print("Found word: ", word.string)
                 for cell in word.cells {
                     cell.solidify()
                 }
@@ -280,19 +283,28 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
                             return
                         }
                     }
-                case .diagonal:
+                default : //diagonal
                     if (cell.matrixPos.0 == previousPos.matrixPos.0
                         || cell.matrixPos.1 == previousPos.matrixPos.1) {
-                        return //not in same direction
-                    } else { //same direction, check if skipped
+                        return //not diagonal
+                    } else { //diagonal, check if right diagonal
                         let diffX = previousPos.matrixPos.0 - cell.matrixPos.0
                         let diffY = previousPos.matrixPos.1 - cell.matrixPos.1
                         
-                        if diffX != diffY {
-                            return
-                        } else {
-                            if diffX > 1 {
-                                return
+                        if direction == .diagonal_TL_BR {
+                            if (diffX != diffY){
+                                return //wrong axis
+                            }
+                            if (abs(diffX) > 1){
+                                return //went ahead
+                            }
+                        } else { //direction == .diagonal_TR_BL
+                            if (abs(diffX) != abs(diffY)) || !(diffX < diffY || diffY < diffX){
+                                return //wrong axis
+                            }
+                            
+                            if abs(diffX) > 1{
+                                return //went ahead
                             }
                         }
                     }
