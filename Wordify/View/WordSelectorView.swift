@@ -81,12 +81,12 @@ class WordSelectorView: UIView {
         layout.scrollDirection = direction
         
         switch direction {
-        case .horizontal:
-            collectionView.alwaysBounceVertical = false
-            collectionView.alwaysBounceHorizontal = true
-        case .vertical:
-            collectionView.alwaysBounceVertical = true
-            collectionView.alwaysBounceHorizontal = false
+            case .horizontal:
+                collectionView.alwaysBounceVertical = false
+                collectionView.alwaysBounceHorizontal = true
+            case .vertical:
+                collectionView.alwaysBounceVertical = true
+                collectionView.alwaysBounceHorizontal = false
         }
     }
 
@@ -115,7 +115,7 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     
     //sizing
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 90, height: 50)
+        return CGSize(width: 90, height: 40)
     }
     
     func tapped(sender: SelectorCell) {

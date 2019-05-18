@@ -14,7 +14,6 @@ protocol WordSearchViewDelegate: AnyObject {
 
 class WordSearchView: UIView, UIGestureRecognizerDelegate {
     //MARK: Vars
-    
     ///size of grid
     var size : Int = 0
     

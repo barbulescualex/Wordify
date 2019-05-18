@@ -13,11 +13,27 @@ class ViewController: UIViewController {
     var wordSearchViewWidthAnchor : NSLayoutConstraint?
     var wordSelectorViewConstraints = [NSLayoutConstraint]()
     
+    var wordsFound = 0 {
+        didSet{
+            wordCountLabel.text = "Found: \(wordsFound)/8"
+        }
+    }
+    
     //MARK: View Components
     private var titleLabel : UILabel = {
         let label = UILabel()
         label.text = "Wordify"
         label.font = UIFont.systemFont(ofSize: 30, weight: .heavy)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.alpha = 0
+        label.textColor = UIColor.offWhite
+        return label
+    }()
+    
+    private var wordCountLabel : UILabel = {
+        let label = UILabel()
+        label.text = "Found: 0/8"
+        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.alpha = 0
         label.textColor = UIColor.offWhite
@@ -73,6 +89,7 @@ class ViewController: UIViewController {
         
         //add subviews
         view.addSubview(titleLabel)
+        view.addSubview(wordCountLabel)
         view.addSubview(refreshButton)
         view.addSubview(wordSelectorView)
         view.addSubview(wordSearchView)
@@ -82,6 +99,9 @@ class ViewController: UIViewController {
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+            
+            wordCountLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 3),
+            wordCountLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
             
             refreshButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
             refreshButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
@@ -130,15 +150,14 @@ class ViewController: UIViewController {
                                            wordSelectorView.heightAnchor.constraint(equalTo: wordSearchView.heightAnchor),
                                            wordSelectorView.centerYAnchor.constraint(equalTo: wordSearchView.centerYAnchor)
                                           ]
+            
             NSLayoutConstraint.activate(wordSelectorViewConstraints)
             
             wordSelectorView.updateScrollDirection(direction: .vertical)
         }
-
     }
     
     //MARK: Animations
-    
     /// fades views in on viewDidLoad
     fileprivate func animateIn(){
         UIView.animate(withDuration: 0.1, animations: {
@@ -153,25 +172,28 @@ class ViewController: UIViewController {
     fileprivate func reloadWordSearch(first: Bool){
         UIView.animate(withDuration: 0.2, animations: {
             self.wordSearchView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-            self.wordSearchView.alpha = 1
+            if first {
+                self.wordSearchView.alpha = 1
+            }
         }, completion: { (_) in
             UIView.animate(withDuration: 0.1, animations: {
                 self.wordSearchView.transform = CGAffineTransform.identity
                 if first {
                     self.wordSelectorView.alpha = 1
+                    self.wordCountLabel.alpha = 1
                 }
             }, completion: { (_) in
                 if first {
                     self.wordSearchView.populateChars()
                 } else {
                     self.wordSearchView.reloadChars()
+                    self.wordsFound = 0
                 }
             })
         })
     }
     
     //MARK: Event Handlers
-    
     /// handler for refresh button, reloads the words search
     @objc fileprivate func refreshPressed(_ sender: UIButton?){
         reloadWordSearch(first: false)
@@ -197,6 +219,7 @@ extension ViewController: WordSelectorViewDelegate {
 
 extension ViewController: WordSearchViewDelegate {
     func foundWord(word: Word) {
+        wordsFound += 1
         wordSelectorView.removeWordFromSelection(word: word)
     }
 }
