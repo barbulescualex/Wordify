@@ -14,6 +14,7 @@ class Grid{
     private var cellArray = [CharCell]()
     private var sideLength = 0
     private var words = [Word]()
+    private var wordsNotAdded = [String]()
     private var wordSet = [String]()
     
     //MARK: Entrance
@@ -25,27 +26,38 @@ class Grid{
         randomizeArray(&self.wordSet)
         
         addWords()
+        addNotAdded()
         fillRest()
-
         return words
     }
     
     //MARK: Adding Words
     private func addWords(){
-        words.removeAll()
-        for word in self.wordSet {
-            if !(addWord(string: word)){
-                break
-            }
-        }
-        if wordSet.count != words.count { //try again
-            addWords()
+        for word in wordSet {
+            _ = addWord(string: word, direction: nil)
         }
     }
     
-    private func addWord(string: String) -> Bool{
+    private func addNotAdded(){
+        for word in wordsNotAdded {
+            if(addWord(string: word, direction: .horizontal)) {
+                continue
+            }
+            if(addWord(string: word, direction: .vertical)) {
+                continue
+            }
+            if(addWord(string: word, direction: .diagonal_TL_BR)) {
+                continue
+            }
+            if(addWord(string: word, direction: .diagonal_TR_BL)) {
+                continue
+            }
+        }
+    }
+    
+    private func addWord(string: String, direction: Direction?) -> Bool{
         //random direction to place the word in
-        let direction = Direction(rawValue: Int.random(in: 0...3)) ?? .horizontal
+        let dir = (direction == nil) ? Direction(rawValue: Int.random(in: 0...3)) ?? .horizontal : direction!
         let sizeOfWord = string.count
         
         //constraints and parameters for how we'll try to place the word
@@ -58,7 +70,7 @@ class Grid{
         var maxLoops = 0
         var indexIncrementer = 0
         
-        switch direction {
+        switch dir {
             case .horizontal:
                 minX = 0
                 minY = 0
@@ -125,7 +137,10 @@ class Grid{
                     continue
                 }
                 //else conflict, try new candidate placement
-                charCells = []//clear
+                for cell in charCells { //clear assignments
+                    cell.char =  nil
+                }
+                charCells.removeAll()
                 couldPlace = false
                 break
             }
@@ -135,9 +150,15 @@ class Grid{
                 placed = true
                 let word = Word(string: string, cells: charCells, found: false)
                 words.append(word)
+                
+                if let index = wordsNotAdded.firstIndex(of: string) {
+                    wordsNotAdded.remove(at: index)
+                }
             } //else loop again with new random position
         }
-        
+        if !placed {
+            wordsNotAdded.append(string)
+        }
         return placed
     }
     
@@ -149,6 +170,12 @@ class Grid{
             if cell.char == nil {
                 cell.char = Data.randomChar
             }
+        }
+    }
+    
+    private func clearAll(){
+        for cell in cellArray {
+            cell.char = nil
         }
     }
     

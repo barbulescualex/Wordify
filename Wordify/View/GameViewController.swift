@@ -51,7 +51,7 @@ class GameViewController: UIViewController {
     }()
     
     private lazy var wordSearchView : WordSearchView = {
-        let view = WordSearchView(size: 15)
+        let view = WordSearchView(size: 10)
         view.alpha = 0
         view.delegate = self
         return view
