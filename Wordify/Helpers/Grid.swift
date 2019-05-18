@@ -36,7 +36,7 @@ class Grid{
     
     private func addWord(string: String){
         //random direction to place the word in
-        let direction = Direction(rawValue: Int.random(in: 0...1)) ?? .horizontal
+        let direction = Direction.diagonal_TL_BR //Direction(rawValue: Int.random(in: 0...1)) ?? .horizontal
         let charArray = string.map({$0})
         let sizeOfWord = charArray.count
         
@@ -136,12 +136,12 @@ class Grid{
                     if (cell.char == nil) {
                         cell.char = char //add the word char in
                         charCells.append(cell) //add it to the charCells
-                        indexInCellArray += 10
+                        indexInCellArray += sideLength
                         continue
                     }
                     if (cell.char == char){
                         charCells.append(cell) //we're good with the overlap
-                        indexInCellArray += 10
+                        indexInCellArray += sideLength
                         continue
                     }
                     //else conflict, try new candidate placement
@@ -163,7 +163,63 @@ class Grid{
             }
         }
         
-        
+        if direction == .diagonal_TL_BR {
+            //shopify
+            var startingCornerPoint = sideLength - sizeOfWord //will make square with the origin point of possible starting positions
+            if startingCornerPoint < 0 {
+                startingCornerPoint = 0
+            }
+            let minY = 0
+            let minX = 0
+            let maxX = startingCornerPoint
+            let maxY = startingCornerPoint
+            
+            var maxLoops = (maxY+1)*(maxX+1)
+            
+            var placed = false
+            
+            var charCells = [CharCell]()
+            
+            while(!placed && maxLoops != 0){
+                maxLoops -= 1
+                let candidateX = Int.random(in: minX...maxX)
+                let candidateY = Int.random(in: minY...maxY)
+                
+                var indexInCellArray = candidateY*sideLength + candidateX
+                var couldPlace = true
+                
+                for (i,char) in charArray.enumerated() {
+                    let cell = cellArray[indexInCellArray]
+                    if (cell.char == nil) {
+                        cell.char = char //add the word char in
+                        charCells.append(cell) //add it to the charCells
+                        indexInCellArray += sideLength + 1
+                        continue
+                    }
+                    if (cell.char == char){
+                        charCells.append(cell) //we're good with the overlap
+                        indexInCellArray += sideLength + 1
+                        continue
+                    }
+                    //else conflict, try new candidate placement
+                    charCells = []//clear
+                    couldPlace = false
+                    break
+                }
+                
+                if couldPlace {
+                    //everything was placed sucessfully
+                    placed = true
+                    let word = Word(string: string, cells: charCells, found: false)
+                    words.append(word)
+                } //else loop again with new random position
+            }
+            
+            if placed == false {
+                print("couldn't place: ", string)
+            }
+            
+        }
     }
     
     
