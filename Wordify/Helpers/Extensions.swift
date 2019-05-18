@@ -10,8 +10,10 @@ import UIKit
 
 //just some colors :)
 extension UIColor {
-    static let offWhite = UIColor(red: 248/250, green: 248/250, blue: 248/250, alpha: 1)
-    static let highlight = UIColor(red: 150/250, green: 191/250, blue: 72/250, alpha: 1)
+    static let offWhite = UIColor(red: 245/255, green: 251/255, blue: 241/255, alpha: 1)
+    static let pink = UIColor(red: 254/255, green: 185/255, blue: 200/255, alpha: 1)
+    static let darkPink = UIColor(red: 246/255, green: 167/255, blue: 186/255, alpha: 1)
+    static let green = UIColor(red: 210/255, green: 243/255, blue: 224/255, alpha: 1)
 }
 
 //easy extension to cancel a gesture

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class GameViewController: UIViewController {
     //MARK: Vars
     var wordSearchViewWidthAnchor : NSLayoutConstraint?
     var wordSelectorViewConstraints = [NSLayoutConstraint]()
@@ -26,7 +26,7 @@ class ViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 30, weight: .heavy)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.alpha = 0
-        label.textColor = UIColor.offWhite
+        label.textColor = UIColor.gray
         return label
     }()
     
@@ -36,14 +36,14 @@ class ViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.alpha = 0
-        label.textColor = UIColor.offWhite
+        label.textColor = UIColor.gray
         return label
     }()
     
     private lazy var refreshButton : UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "refresh")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        button.tintColor = UIColor.offWhite
+        button.tintColor = UIColor.gray
         button.alpha = 0
         button.addTarget(self, action: #selector(refreshPressed(_:)), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -85,7 +85,7 @@ class ViewController: UIViewController {
     //MARK: Setup
     fileprivate func setup(){
          NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
-        view.backgroundColor = UIColor.highlight
+        view.backgroundColor = UIColor.green
         
         //add subviews
         view.addSubview(titleLabel)
@@ -210,14 +210,14 @@ class ViewController: UIViewController {
 
 }
 
-extension ViewController: WordSelectorViewDelegate {
+extension GameViewController: WordSelectorViewDelegate {
     func showWord(word: String?) {
         guard let word = word else {return}
         wordSearchView.showWord(named: word)
     }
 }
 
-extension ViewController: WordSearchViewDelegate {
+extension GameViewController: WordSearchViewDelegate {
     func foundWord(word: Word) {
         wordsFound += 1
         wordSelectorView.removeWordFromSelection(word: word)

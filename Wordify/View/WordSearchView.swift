@@ -236,10 +236,10 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         previousPos = nil
     }
     
-    
     public func showWord(named: String){
+        let reversed = String(named.reversed())
         for word in words {
-            if word.string == named {
+            if word.string == named  || word.string == reversed{
                 for cell in word.cells {
                     cell.show()
                 }

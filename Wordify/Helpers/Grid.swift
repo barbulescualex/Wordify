@@ -13,14 +13,33 @@ class Grid{
     private var cellArray = [CharCell]()
     private var sideLength = 0
     private var words = [Word]()
+    private var wordSet = [String]()
     
     public func populateGrid(sideLength: Int, wordSet: [String], cellArray: [CharCell]) -> [Word]{
         self.sideLength = sideLength
         self.cellArray = cellArray
+        self.wordSet = wordSet
         
-        addWord(string: wordSet[0])
+        randomizeArray(&self.wordSet)
+        print(self.wordSet)
+        
+        addWord(string: self.wordSet[0])
         fillRest()
         return words
+    }
+    
+    private func randomizeArray(_ array: inout [String]){
+        //randomize order
+        array.shuffle()
+        //randomize direction (forward backwards)
+        array = array.map({ val -> String in
+            let random = Bool.random()
+            if random {
+                return String(val.reversed())
+            } else {
+                return val
+            }
+        })
     }
     
     private func addWord(string: String){

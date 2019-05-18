@@ -27,6 +27,9 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     //boolean flag to indify that this cell was part of a valid and found string
     private(set) var solidified = false
     
+    private var solidifiedColor = UIColor.pink
+    private var highlightColor = UIColor.green
+    
     //Mark: View Components
     private var charLabel : UILabel = {
         let label = UILabel()
@@ -91,7 +94,7 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     public func addHighlight(){
         UIView.animate(withDuration: 0.1) {
             self.charLabel.textColor = UIColor.white
-            self.backgroundColor = UIColor.highlight
+            self.backgroundColor = self.highlightColor
         }
         highlighted = true
     }
@@ -101,7 +104,7 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
 //        if highlighted {
             UIView.animate(withDuration: 0.1) {
                 self.charLabel.textColor = self.solidified ? UIColor.offWhite : UIColor.gray
-                self.backgroundColor = self.solidified ? UIColor.lightGray : UIColor.clear
+                self.backgroundColor = self.solidified ? self.solidifiedColor : UIColor.clear
             }
             highlighted = false
 //        }
@@ -125,7 +128,7 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
         solidified = true
         UIView.animate(withDuration: 0.1) {
             self.charLabel.textColor = UIColor.white
-            self.backgroundColor = UIColor.lightGray
+            self.backgroundColor = self.solidifiedColor
         }
         highlighted = false
     }
@@ -133,11 +136,11 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     public func show(){
         UIView.animate(withDuration: 0.3, animations: {
             self.charLabel.textColor = UIColor.white
-            self.backgroundColor = UIColor.highlight.withAlphaComponent(0.5)
+            self.backgroundColor = self.highlightColor.withAlphaComponent(0.5)
         }){_ in
             UIView.animate(withDuration: 0.2, animations: {
                 self.charLabel.textColor = self.solidified ? UIColor.offWhite : UIColor.gray
-                self.backgroundColor = self.solidified ? UIColor.lightGray : UIColor.clear
+                self.backgroundColor = self.solidified ? self.solidifiedColor : UIColor.clear
             })
         }
     }
