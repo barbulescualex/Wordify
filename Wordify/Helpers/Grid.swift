@@ -36,28 +36,20 @@ class Grid{
     
     private func addWord(string: String){
         //random direction to place the word in
-        let direction = Direction.diagonal_TR_BL //Direction(rawValue: Int.random(in: 0...2)) ?? .horizontal
+        let direction = Direction(rawValue: Int.random(in: 0...3)) ?? .horizontal
         let charArray = string.map({$0})
         let sizeOfWord = charArray.count
         
         if direction == .horizontal {
             //constraints on y axis
+            let minX = 0
             let minY = 0
-            let maxY = sideLength - 1
             
             //constraints on x axis
-            let minX = 0
-            var maxX = sideLength - sizeOfWord - 1
+            var maxX = sideLength - sizeOfWord
+            let maxY = sideLength - 1
             
-            
-            var maxLoops = maxY*maxX
-            
-            if maxX < 0 {
-                maxX = 0
-            }
-            if maxX == 0 {
-                maxLoops = maxY
-            }
+            var maxLoops = (maxY+1)*(maxX+1)
             
             var placed = false
             
@@ -105,19 +97,12 @@ class Grid{
         
         if direction == .vertical {
             let minX = 0
-            let maxX = sideLength - 1
-            
             let minY = 0
-            var maxY = sideLength - sizeOfWord - 1
             
-            var maxLoops = maxY*maxX
+            let maxX = sideLength - 1
+            var maxY = sideLength - sizeOfWord
             
-            if maxY < 0 {
-                maxY = 0
-            }
-            if maxY == 0 {
-                maxLoops = maxX
-            }
+            var maxLoops = (maxY+1)*(maxX+1)
             
             var placed = false
             
