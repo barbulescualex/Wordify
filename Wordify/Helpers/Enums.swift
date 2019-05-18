@@ -9,7 +9,7 @@
 import Foundation
 
 ///Specifies direction a highlight should occur in
-public enum Direction {
+public enum Direction : Int {
     case horizontal
     case vertical
 //    case diagonal
