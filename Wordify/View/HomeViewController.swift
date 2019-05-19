@@ -30,6 +30,7 @@ class HomeViewController: UIViewController {
     
     private var titleStackConstraints = [NSLayoutConstraint]()
     
+    //MARK: View Components
     private var titleStack : UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -58,7 +59,6 @@ class HomeViewController: UIViewController {
         button.contentEdgeInsets = UIEdgeInsets(top: 7, left: 50, bottom: 10, right: 50)
         return button
     }()
-    
     
     private lazy var slider: UISlider = {
         let slider = UISlider()
@@ -96,6 +96,7 @@ class HomeViewController: UIViewController {
         return label
     }()
     
+    //MARK: Init
     required init() {
         super.init(nibName: nil, bundle: nil)
         setup()
@@ -106,6 +107,7 @@ class HomeViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: Lifecycle Functions
     override func viewDidLoad() {
         super.viewDidLoad()
         animateInTitle(index: 0)
@@ -129,6 +131,7 @@ class HomeViewController: UIViewController {
         }
     }
     
+    //MARK: Setup
     fileprivate func setup(){
         view.backgroundColor = UIColor.offWhite
         
@@ -179,16 +182,7 @@ class HomeViewController: UIViewController {
         player.play()
     }
     
-    fileprivate func viewDidAppearAnimation(){
-        UIView.animate(withDuration: 0.4, animations: {
-            self.playButton.alpha = 1
-            self.slider.alpha = 1
-            self.gridSizeLabel.alpha = 1
-            self.emojiView.alpha = 1
-            self.titleStack.alpha = 1
-        })
-    }
-    
+    //MARK: Animations
     fileprivate func animateIn(){
         NSLayoutConstraint.deactivate(titleStackConstraints)
         
@@ -198,10 +192,10 @@ class HomeViewController: UIViewController {
             titleStack.widthAnchor.constraint(equalToConstant: 245),
             titleStack.heightAnchor.constraint(equalToConstant: 35),
         ]
-         NSLayoutConstraint.activate(self.titleStackConstraints)
+        NSLayoutConstraint.activate(self.titleStackConstraints)
         
         UIView.animate(withDuration: 0.4, animations:  {
-           self.view.layoutIfNeeded()
+            self.view.layoutIfNeeded()
             for view in self.titleStack.arrangedSubviews {
                 guard let cell = view as? CharCell else {continue}
                 cell.fontSize = 30
@@ -232,6 +226,17 @@ class HomeViewController: UIViewController {
         }
     }
     
+    fileprivate func viewDidAppearAnimation(){
+        UIView.animate(withDuration: 0.4, animations: {
+            self.playButton.alpha = 1
+            self.slider.alpha = 1
+            self.gridSizeLabel.alpha = 1
+            self.emojiView.alpha = 1
+            self.titleStack.alpha = 1
+        })
+    }
+    
+    //MARK: Event Handlers
     @objc func play(_ sender: UIButton){
         UIView.animate(withDuration: 0.3, animations: {
             sender.backgroundColor = UIColor.green

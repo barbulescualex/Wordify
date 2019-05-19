@@ -9,9 +9,9 @@
 import UIKit
 
 class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
-    public var word: String? {
+    public var word : Word? {
         didSet{
-            label.text = word
+            label.text = word?.string
         }
     }
     

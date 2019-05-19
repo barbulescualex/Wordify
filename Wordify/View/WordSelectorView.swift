@@ -9,14 +9,21 @@
 import UIKit
 
 protocol WordSelectorViewDelegate : AnyObject {
-    func showWord(word: String?)
+    func showWord(word: Word)
 }
 
 class WordSelectorView: UIView {
+    //MARS: Vars
     private let id = "cell"
+    public var words = [Word]() {
+        didSet{
+            collectionView.reloadData()
+        }
+    }
     
-    private var data = Data.words
+    weak var delegate : WordSelectorViewDelegate?
     
+    //MARK: View Components
     public var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 10
@@ -41,9 +48,8 @@ class WordSelectorView: UIView {
         collectionView.allowsMultipleSelection = false
         return collectionView
     }()
-    
-    weak var delegate : WordSelectorViewDelegate?
 
+    //MARK: Init
     required init() {
         super.init(frame: .zero)
         setup()
@@ -53,6 +59,7 @@ class WordSelectorView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: Setup
     fileprivate func setup(){
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(collectionView)
@@ -66,15 +73,10 @@ class WordSelectorView: UIView {
         ])
     }
     
+    //MARK: Functions
     public func removeWordFromSelection(word: Word){
-        guard let index = data.firstIndex(of: word.string) else {return}
-        data.remove(at: index)
-        collectionView.reloadData()
-    }
-    
-    public func reset(){
-        data = Data.words
-        collectionView.reloadData()
+        guard let index = words.firstIndex(of: word) else {return}
+        words.remove(at: index)
     }
     
     public func updateScrollDirection(direction : UICollectionView.ScrollDirection){
@@ -87,6 +89,8 @@ class WordSelectorView: UIView {
             case .vertical:
                 collectionView.alwaysBounceVertical = true
                 collectionView.alwaysBounceHorizontal = false
+        @unknown default:
+            print("unkown default in word selector view update word selector view")
         }
     }
 
@@ -99,27 +103,25 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return data.count
+        return words.count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! SelectorCell
-        cell.word = data[indexPath.item]
+        cell.word = words[indexPath.item]
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? SelectorCell else { return }
-        delegate?.showWord(word: cell.word)
+        guard let cell = collectionView.cellForItem(at: indexPath) as? SelectorCell else {return}
+        guard let word = cell.word else {return}
+        cell.tapped()
+        delegate?.showWord(word: word)
     }
     
     //sizing
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 90, height: 40)
-    }
-    
-    func tapped(sender: SelectorCell) {
-        delegate?.showWord(word: sender.word)
     }
 }
 

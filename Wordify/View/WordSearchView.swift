@@ -10,6 +10,8 @@ import UIKit
 
 protocol WordSearchViewDelegate: AnyObject {
     func foundWord(word: Word)
+    //let parent know about knew words
+    func updateWords(words: [Word])
 }
 
 class WordSearchView: UIView, UIGestureRecognizerDelegate {
@@ -34,7 +36,11 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     var highlightedCells = [CharCell]()
     
     ///Reference to all the words in the grid
-    var words = [Word]()
+    var words = [Word](){
+        didSet{
+            delegate?.updateWords(words: words)
+        }
+    }
     
     weak var delegate : WordSearchViewDelegate?
     
@@ -236,14 +242,9 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         previousPos = nil
     }
     
-    public func showWord(named: String){
-        let reversed = String(named.reversed())
-        for word in words {
-            if word.string == named  || word.string == reversed{
-                for cell in word.cells {
-                    cell.show()
-                }
-            }
+    public func showWord(word: Word){
+        for cell in word.cells {
+            cell.show()
         }
     }
     

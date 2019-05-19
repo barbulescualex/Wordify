@@ -15,7 +15,7 @@ public struct Position {
 }
 
 ///represents a word, with reference to the char cells
-public struct Word {
+public struct Word : Equatable {
     var string : String
     var cells : [CharCell]
     var found = false

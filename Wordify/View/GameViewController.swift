@@ -16,10 +16,19 @@ class GameViewController: UIViewController {
     var wordsFound = 0 {
         didSet{
             wordCountLabel.text = "\(wordsFound)/8"
+            if (wordsFound == 8) {
+                endGame()
+            }
         }
     }
     
     var size = 10
+    
+    var words = [Word](){
+        didSet{
+            wordSelectorView.words = words
+        }
+    }
     
     //MARK: View Components
     private var wordCountLabel : UILabel = {
@@ -203,28 +212,39 @@ class GameViewController: UIViewController {
     /// handler for refresh button, reloads the words search
     @objc fileprivate func refreshPressed(_ sender: UIButton?){
         reloadWordSearch(first: false)
-        self.wordSelectorView.reset()
     }
     
     @objc fileprivate func homePressed(_ sender: UIButton?){
-        self.dismiss(animated: true, completion: nil)
+        endGame()
+        //self.dismiss(animated: true, completion: nil)
     }
     
     @objc fileprivate func orientationChanged(){
         updateConstraints()
     }
     
+    fileprivate func endGame(){
+        let endView = EndGameView()
+        endView.delegate = self
+        view.addSubview(endView)
+        NSLayoutConstraint.activate([
+            endView.topAnchor.constraint(equalTo: view.topAnchor),
+            endView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            endView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            endView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+    }
+    
+    //MARK: Deinit
     deinit {
-        print("deinit")
         NotificationCenter.default.removeObserver(self)
     }
 
 }
 
 extension GameViewController: WordSelectorViewDelegate {
-    func showWord(word: String?) {
-        guard let word = word else {return}
-        wordSearchView.showWord(named: word)
+    func showWord(word: Word) {
+        wordSearchView.showWord(word: word)
     }
 }
 
@@ -232,5 +252,16 @@ extension GameViewController: WordSearchViewDelegate {
     func foundWord(word: Word) {
         wordsFound += 1
         wordSelectorView.removeWordFromSelection(word: word)
+    }
+    
+    func updateWords(words: [Word]) {
+        self.words = words
+    }
+}
+
+extension GameViewController: EndGameViewDelegate {
+    func closeView(_ sender: EndGameView) {
+        sender.removeFromSuperview()
+        reloadWordSearch(first: false)
     }
 }
