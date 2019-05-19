@@ -12,6 +12,7 @@ class GameViewController: UIViewController {
     //MARK: Vars
     var wordSearchViewWidthAnchor : NSLayoutConstraint?
     var wordSelectorViewConstraints = [NSLayoutConstraint]()
+    var wordsFoundViewConstraints = [NSLayoutConstraint]()
     
     var wordsFound = 0 {
         didSet{
@@ -33,11 +34,12 @@ class GameViewController: UIViewController {
     //MARK: View Components
     private var wordCountLabel : UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 25, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.alpha = 0
         label.text = "0/8"
         label.textColor = UIColor.gray
+        label.textAlignment = .center
         return label
     }()
     
@@ -117,9 +119,6 @@ class GameViewController: UIViewController {
             homeButton.heightAnchor.constraint(equalToConstant: 30),
             homeButton.widthAnchor.constraint(equalToConstant: 30),
             
-            wordCountLabel.topAnchor.constraint(equalTo: homeButton.bottomAnchor, constant: 3),
-            wordCountLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
-            
             refreshButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
             refreshButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
             refreshButton.heightAnchor.constraint(equalToConstant: 30),
@@ -137,12 +136,11 @@ class GameViewController: UIViewController {
         //clear previous
         wordSearchViewWidthAnchor?.isActive = false
         NSLayoutConstraint.deactivate(wordSelectorViewConstraints)
+        NSLayoutConstraint.deactivate(wordsFoundViewConstraints)
         
         //update new
-        if (view.frame.height > view.frame.width) {
-            wordSearchViewWidthAnchor?.isActive = false
-            NSLayoutConstraint.deactivate(wordSelectorViewConstraints)
-            
+        if (view.frame.height > view.frame.width) { //portrait
+            //activate new
             wordSearchViewWidthAnchor = wordSearchView.widthAnchor.constraint(equalToConstant: self.view.frame.width)
             wordSearchViewWidthAnchor?.isActive = true
             
@@ -153,13 +151,22 @@ class GameViewController: UIViewController {
             
             NSLayoutConstraint.activate(wordSelectorViewConstraints)
             
+            wordsFoundViewConstraints = [wordCountLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+                                         wordCountLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                                         wordCountLabel.bottomAnchor.constraint(equalTo: wordSearchView.topAnchor),
+                                         ]
+            
+            NSLayoutConstraint.activate(wordsFoundViewConstraints)
+            
             wordSelectorView.updateScrollDirection(direction: .horizontal)
-        } else {
+        } else { //lanscape
+            //padding
             var bottomPadding = view.safeAreaInsets.bottom
             if (bottomPadding == 0) {
                 bottomPadding = 10 //add some anyways for the aesthetics
             }
             
+            //activate new
             wordSearchViewWidthAnchor = wordSearchView.widthAnchor.constraint(equalToConstant: self.view.frame.height - bottomPadding*2)
             wordSearchViewWidthAnchor?.isActive = true
             
@@ -170,6 +177,13 @@ class GameViewController: UIViewController {
                                           ]
             
             NSLayoutConstraint.activate(wordSelectorViewConstraints)
+            
+            wordsFoundViewConstraints = [wordCountLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+                                         wordCountLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                                         wordCountLabel.trailingAnchor.constraint(equalTo: wordSearchView.safeAreaLayoutGuide.leadingAnchor),
+            ]
+            
+            NSLayoutConstraint.activate(wordsFoundViewConstraints)
             
             wordSelectorView.updateScrollDirection(direction: .vertical)
         }
