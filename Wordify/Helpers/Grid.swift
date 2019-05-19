@@ -26,6 +26,7 @@ class Grid{
         randomizeArray(&self.wordSet)
         
         addWords()
+        print(wordsNotAdded)
         addNotAdded()
         fillRest()
         return words
@@ -153,7 +154,6 @@ class Grid{
                 for cell in charCells {
                     cell.isPartOfWord = true
                 }
-                print(rstring, rstring.nonReversedValue())
                 let word = Word(string: rstring.nonReversedValue(), cells: charCells)
                 words.append(word)
                 

@@ -10,7 +10,6 @@ import UIKit
 
 public class CharCell: UIView, UIGestureRecognizerDelegate {
     //MARK: Vars
-    
     ///character the cell holds
     var char : Character? {
         didSet{
@@ -110,13 +109,13 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
     
     ///removes the highlight state
     public func removeHighlight(){
-//        if highlighted {
+        if highlighted {
             UIView.animate(withDuration: 0.1) {
                 self.charLabel.textColor = self.solidified ? UIColor.offWhite : UIColor.gray
                 self.backgroundColor = self.solidified ? self.solidifiedColor : UIColor.clear
             }
-            highlighted = false
-//        }
+//            highlighted = false
+        }
     }
     
     ///resets all state
@@ -133,7 +132,10 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
     
     ///sets cell soldify state
     public func solidify(){
-        if solidified {return}
+        if solidified {
+            removeHighlight()
+            return
+        }
         solidified = true
         UIView.animate(withDuration: 0.1) {
             self.charLabel.textColor = UIColor.white

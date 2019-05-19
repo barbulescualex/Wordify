@@ -69,14 +69,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         //properties
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = UIColor.offWhite
-        
-        //shadow
-//        layer.masksToBounds = false
         layer.cornerRadius = 10
-//        layer.shadowColor = UIColor.gray.cgColor
-//        layer.shadowOpacity = 0.5
-//        layer.shadowOffset = CGSize(width: -1, height: 1)
-//        layer.shadowRadius = 5
         
         //children
         addSubview(stackContainer)
