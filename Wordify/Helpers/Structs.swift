@@ -13,3 +13,15 @@ public struct Position {
     var direction : Direction?
     var matrixPos : (Int,Int)
 }
+
+public struct Rstring : Equatable {
+    var value : String
+    var reversed : Bool
+    
+    public func nonReversedValue() -> String {
+        if reversed {
+            return String(value.reversed())
+        }
+        return value
+    }
+}

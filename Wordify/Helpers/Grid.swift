@@ -14,14 +14,14 @@ class Grid{
     private var cellArray = [CharCell]()
     private var sideLength = 0
     private var words = [Word]()
-    private var wordsNotAdded = [String]()
-    private var wordSet = [String]()
+    private var wordsNotAdded = [Rstring]()
+    private var wordSet = [Rstring]()
     
     //MARK: Entrance
     public func populateGrid(sideLength: Int, wordSet: [String], cellArray: [CharCell]) -> [Word]{
         self.sideLength = sideLength
         self.cellArray = cellArray
-        self.wordSet = wordSet
+        self.wordSet = wordSet.map({Rstring(value: $0, reversed: false)})
         
         randomizeArray(&self.wordSet)
         
@@ -34,31 +34,31 @@ class Grid{
     //MARK: Adding Words
     private func addWords(){
         for word in wordSet {
-            _ = addWord(string: word, direction: nil)
+            _ = addWord(rstring: word, direction: nil)
         }
     }
     
     private func addNotAdded(){
         for word in wordsNotAdded {
-            if(addWord(string: word, direction: .horizontal)) {
+            if(addWord(rstring: word, direction: .horizontal)) {
                 continue
             }
-            if(addWord(string: word, direction: .vertical)) {
+            if(addWord(rstring: word, direction: .vertical)) {
                 continue
             }
-            if(addWord(string: word, direction: .diagonal_TL_BR)) {
+            if(addWord(rstring: word, direction: .diagonal_TL_BR)) {
                 continue
             }
-            if(addWord(string: word, direction: .diagonal_TR_BL)) {
+            if(addWord(rstring: word, direction: .diagonal_TR_BL)) {
                 continue
             }
         }
     }
     
-    private func addWord(string: String, direction: Direction?) -> Bool{
+    private func addWord(rstring: Rstring, direction: Direction?) -> Bool{
         //random direction to place the word in
         let dir = (direction == nil) ? Direction(rawValue: Int.random(in: 0...3)) ?? .horizontal : direction!
-        let sizeOfWord = string.count
+        let sizeOfWord = rstring.value.count
         
         //constraints and parameters for how we'll try to place the word
         var minX = 0
@@ -103,11 +103,11 @@ class Grid{
                 indexIncrementer = sideLength - 1
         }
         
-        return tryToPlaceWord(minX: minX, minY: minY, maxX: maxX, maxY: maxY, maximumLoops: maxLoops, indexIncrementor: indexIncrementer, string: string)
+        return tryToPlaceWord(minX: minX, minY: minY, maxX: maxX, maxY: maxY, maximumLoops: maxLoops, indexIncrementor: indexIncrementer, rstring: rstring)
     }
     
-    private func tryToPlaceWord(minX: Int, minY: Int, maxX: Int, maxY: Int, maximumLoops: Int, indexIncrementor: Int, string: String) -> Bool{
-        let charArray = string.map({$0})
+    private func tryToPlaceWord(minX: Int, minY: Int, maxX: Int, maxY: Int, maximumLoops: Int, indexIncrementor: Int, rstring: Rstring) -> Bool{
+        let charArray = rstring.value.map({$0})
         
         var placed = false
         
@@ -153,16 +153,17 @@ class Grid{
                 for cell in charCells {
                     cell.isPartOfWord = true
                 }
-                let word = Word(string: string, cells: charCells)
+                print(rstring, rstring.nonReversedValue())
+                let word = Word(string: rstring.nonReversedValue(), cells: charCells)
                 words.append(word)
                 
-                if let index = wordsNotAdded.firstIndex(of: string) {
+                if let index = wordsNotAdded.firstIndex(of: rstring) {
                     wordsNotAdded.remove(at: index)
                 }
             } //else loop again with new random position
         }
         if !placed {
-            wordsNotAdded.append(string)
+            wordsNotAdded.append(rstring)
         }
         return placed
     }
@@ -185,18 +186,19 @@ class Grid{
     }
     
     ///Randomize order and direction of words passed in to populate grid
-    private func randomizeArray(_ array: inout [String]){
+    private func randomizeArray(_ array: inout [Rstring]){
         //randomize order
         array.shuffle()
         //randomize direction (forward backwards)
-        array = array.map({ val -> String in
+        array = array.map({ (rstring) -> (Rstring) in
             let reverse = Bool.random()
             if reverse {
-                return String(val.reversed())
+                return (Rstring(value: String(rstring.value.reversed()), reversed: true))
             } else {
-                return val
+                return (Rstring(value: rstring.value, reversed: false))
             }
         })
+
     }
     
 }
