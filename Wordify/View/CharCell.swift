@@ -18,6 +18,12 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
         }
     }
     
+    var attributedString : [NSAttributedString.Key]? {
+        didSet{
+            
+        }
+    }
+    
     ///the position it is in the grid matrix (origin is in top left)
     var matrixPos : (Int, Int) = (0,0)
     
