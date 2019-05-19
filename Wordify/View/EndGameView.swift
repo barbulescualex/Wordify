@@ -13,10 +13,10 @@ protocol EndGameViewDelegate : AnyObject {
 }
 
 public class EndGameView : UIView, UIGestureRecognizerDelegate {
-    //MARK:- VARS
+    //MARK: Vars
     weak var delegate : EndGameViewDelegate?
     
-    //MARK:- VIEW COMPONENTS
+    //MARK: View Components
     private let backgroundView : UIView = { //transparent overlay
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -31,47 +31,52 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
         return view
     }()
     
-    //MARK:- INIT
+    //MARK: Init
     public required init() {
         super.init(frame: .zero)
         setupView()
+        populateViewArea()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
     
+    //MARK: Lifecycle Functions
     public override func didMoveToSuperview() {
         super.didMoveToSuperview()
         showAnimate()
     }
     
-    //MARK:- FUNCTIONS
-    
+    //MARK: Setup
     fileprivate func setupView(){
         translatesAutoresizingMaskIntoConstraints = false
         //for pop up look
         layer.zPosition = 100
         clipsToBounds = true
         
-        //background view
         addSubview(backgroundView)
+        addSubview(viewArea)
+        
+        NSLayoutConstraint.activate([
+            backgroundView.topAnchor.constraint(equalTo: topAnchor),
+            backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            
+            viewArea.topAnchor.constraint(equalTo: topAnchor, constant: 200),
+            viewArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200),
+            viewArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 30),
+            viewArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30)
+        ])
+        
+        //tap gesture for background view to close itself
         let tap = UITapGestureRecognizer(target: self, action: #selector(outsidePressed(_:)))
         tap.delegate = self
         backgroundView.addGestureRecognizer(tap)
-        
-        backgroundView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        
-        //view area
-        addSubview(viewArea)
-        viewArea.topAnchor.constraint(equalTo: topAnchor, constant: 200).isActive = true
-        viewArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200).isActive = true
-        viewArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 30).isActive = true
-        viewArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30).isActive = true
-        
+    }
+    
+    fileprivate func populateViewArea(){
         //title label
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 30)
@@ -80,24 +85,12 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         
-//        label.layer.shadowColor = UIColor.black.cgColor
-//        label.layer.shadowRadius = 3.0
-//        label.layer.shadowOpacity = 1.0
-//        label.layer.shadowOffset = CGSize(width: 4, height: 4)
-//        label.layer.masksToBounds = false
-        
         //content
         let content = UIView()
         content.translatesAutoresizingMaskIntoConstraints = false
         content.layer.cornerRadius = 10
         content.clipsToBounds = true
         content.backgroundColor = UIColor.offWhite
-        
-//        content.layer.shadowColor = UIColor.black.cgColor
-//        content.layer.shadowRadius = 3.0
-//        content.layer.shadowOpacity = 1.0
-//        content.layer.shadowOffset = CGSize(width: 4, height: 4)
-//        content.layer.masksToBounds = false
         
         //content label
         let contentLabel = UILabel()
@@ -109,29 +102,28 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
         contentLabel.text = "Thanks for playing, I'm looking forward to being part of the team! 👋🏻☺️"
         
         viewArea.addSubview(label)
-        label.centerXAnchor.constraint(equalTo: viewArea.centerXAnchor).isActive = true
-        label.topAnchor.constraint(equalTo: viewArea.topAnchor, constant: 5).isActive = true
-        label.heightAnchor.constraint(equalToConstant: 35).isActive = true
-        
         viewArea.addSubview(content)
-        content.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 7.5).isActive = true
-        content.trailingAnchor.constraint(equalTo: viewArea.trailingAnchor, constant: -7.5).isActive = true
-        content.leadingAnchor.constraint(equalTo: viewArea.leadingAnchor, constant: 7.5).isActive = true
-        content.bottomAnchor.constraint(equalTo: viewArea.bottomAnchor, constant: -7.5).isActive = true
-        
         content.addSubview(contentLabel)
-        contentLabel.topAnchor.constraint(equalTo: content.topAnchor, constant: 5).isActive = true
-        contentLabel.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -5).isActive = true
-        contentLabel.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 5).isActive = true
-        contentLabel.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -5).isActive = true
         
+        //constraints
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: viewArea.centerXAnchor),
+            label.topAnchor.constraint(equalTo: viewArea.topAnchor, constant: 5),
+            label.heightAnchor.constraint(equalToConstant: 35),
+            
+            content.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 7.5),
+            content.trailingAnchor.constraint(equalTo: viewArea.trailingAnchor, constant: -7.5),
+            content.leadingAnchor.constraint(equalTo: viewArea.leadingAnchor, constant: 7.5),
+            content.bottomAnchor.constraint(equalTo: viewArea.bottomAnchor, constant: -7.5),
+        
+            contentLabel.topAnchor.constraint(equalTo: content.topAnchor, constant: 5),
+            contentLabel.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -5),
+            contentLabel.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 5),
+            contentLabel.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -5),
+        ])
     }
     
-    @objc func outsidePressed(_ sender: UIGestureRecognizer){
-        leaveAnimate()
-    }
-    
-    //MARK:- ANIMATIONS
+    //MARK: Animations
     fileprivate func showAnimate(){
         viewArea.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         viewArea.alpha = 0.0
@@ -140,11 +132,9 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
             self.viewArea.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
             self.backgroundView.backgroundColor = UIColor.pink.withAlphaComponent(0.8)
         }, completion: { _ in
-            UIView.animate(withDuration: 0.075, animations: {
+            UIView.animate(withDuration: 0.075){
                 self.viewArea.transform = CGAffineTransform(scaleX: 1, y: 1)
-            }, completion: { _ in
-                
-            })
+            }
         })
     }
     
@@ -155,5 +145,10 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
         }) { _ in
             self.delegate?.closeView(self)
         }
+    }
+    
+    //MARK: Event Handlers
+    @objc func outsidePressed(_ sender: UIGestureRecognizer){
+        leaveAnimate()
     }
 }
