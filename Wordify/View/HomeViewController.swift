@@ -28,6 +28,8 @@ class HomeViewController: UIViewController {
     
     private var emojis = ["👶","😎","💪","🔥","😈","💀"]
     
+    private var titleStackConstraints = [NSLayoutConstraint]()
+    
     private var titleStack : UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -51,6 +53,7 @@ class HomeViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 20
         button.clipsToBounds = true
+        button.alpha = 0
         button.contentEdgeInsets = UIEdgeInsets(top: 7, left: 25, bottom: 7, right: 25)
         return button
     }()
@@ -63,6 +66,7 @@ class HomeViewController: UIViewController {
         slider.thumbTintColor = UIColor.green
         slider.addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
         slider.translatesAutoresizingMaskIntoConstraints = false
+        slider.alpha = 0
         return slider
     }()
     
@@ -73,6 +77,7 @@ class HomeViewController: UIViewController {
         label.textColor = .lightGray
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
+        label.alpha = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -80,11 +85,15 @@ class HomeViewController: UIViewController {
     private var emojiView: UILabel = {
         let label = UILabel()
         label.text = "👶"
-        label.font = UIFont.systemFont(ofSize: 100)
+        label.font = UIFont.systemFont(ofSize: 80)
         label.textColor = .lightGray
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.translatesAutoresizingMaskIntoConstraints = false
+//        label.backgroundColor = .white
+//        label.layer.cornerRadius = 15
+//        label.clipsToBounds = true
+        label.alpha = 0
         return label
     }()
     
@@ -114,11 +123,6 @@ class HomeViewController: UIViewController {
         view.addSubview(emojiView)
         
         NSLayoutConstraint.activate([
-            titleStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            titleStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            titleStack.widthAnchor.constraint(equalToConstant: 175),
-            titleStack.heightAnchor.constraint(equalToConstant: 25),
-            
             playButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             playButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
@@ -131,8 +135,17 @@ class HomeViewController: UIViewController {
             gridSizeLabel.topAnchor.constraint(equalTo: slider.bottomAnchor, constant: 10),
             
             emojiView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            emojiView.bottomAnchor.constraint(equalTo: slider.topAnchor, constant: 10)
+            emojiView.bottomAnchor.constraint(equalTo: slider.topAnchor, constant: -10)
         ])
+        
+        titleStackConstraints = [
+            titleStack.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            titleStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            titleStack.widthAnchor.constraint(equalToConstant: 250),
+            titleStack.heightAnchor.constraint(equalToConstant: 40),
+        ]
+        
+        NSLayoutConstraint.activate(titleStackConstraints)
         
         sliderFeedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
         sliderFeedbackGenerator?.prepare()
@@ -150,13 +163,38 @@ class HomeViewController: UIViewController {
         player.play()
     }
     
+    fileprivate func animateIn(){
+        NSLayoutConstraint.deactivate(titleStackConstraints)
+        
+        titleStackConstraints = [
+            titleStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            titleStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            titleStack.widthAnchor.constraint(equalToConstant: 175),
+            titleStack.heightAnchor.constraint(equalToConstant: 25),
+        ]
+         NSLayoutConstraint.activate(self.titleStackConstraints)
+        
+        UIView.animate(withDuration: 0.4, animations:  {
+           self.view.layoutIfNeeded()
+        }){ _ in
+            UIView.animate(withDuration: 0.4, animations: {
+                self.playButton.alpha = 1
+                self.slider.alpha = 1
+                self.gridSizeLabel.alpha = 1
+                self.emojiView.alpha = 1
+            })
+        }
+    }
+    
     fileprivate func animateInTitle(index: Int){
         if !titleStack.arrangedSubviews.indices.contains(index) {
+            animateIn()
             return
         }
         guard let cell = titleStack.arrangedSubviews[index] as? CharCell else {
             return
         }
+        print("animating index: ", index)
         cell.addHighlight()
         DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.25) {
             DispatchQueue.main.sync {
