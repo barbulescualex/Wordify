@@ -10,7 +10,7 @@ import UIKit
 
 protocol WordSearchViewDelegate: AnyObject {
     func foundWord(word: Word)
-    //let parent know about knew words
+    //let parent know about new words
     func updateWords(words: [Word])
 }
 
@@ -212,11 +212,6 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
             if ( word.string == candidateWord || word.string == reversedCandidateWord ) && !word.found {
                 found = true
                 words[i].found = true
-                print(word)
-//                print("Found word: ", word.string)
-                for cell in word.cells {
-                    cell.solidify()
-                }
                 delegate?.foundWord(word: word)
             }
         }
@@ -240,12 +235,6 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         highlightedCells = []
         prevCell = nil
         previousPos = nil
-    }
-    
-    public func showWord(word: Word){
-        for cell in word.cells {
-            cell.show()
-        }
     }
     
     ///Gets called from the pan gesture recognizer if a new cell was selected, this function

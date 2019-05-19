@@ -8,21 +8,18 @@
 
 import UIKit
 
-protocol WordSelectorViewDelegate : AnyObject {
-    func showWord(word: Word)
-}
-
 class WordSelectorView: UIView {
     //MARS: Vars
     private let id = "cell"
     public var words = [Word]() {
         didSet{
+            let array = words.map({$0.string
+            })
+            print(array)
             collectionView.reloadData()
         }
     }
-    
-    weak var delegate : WordSelectorViewDelegate?
-    
+
     //MARK: View Components
     public var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -75,7 +72,7 @@ class WordSelectorView: UIView {
     
     //MARK: Functions
     public func removeWordFromSelection(word: Word){
-        guard let index = words.firstIndex(of: word) else {return}
+        guard let index = words.firstIndex(of: word) else {print("word index NOT found");return}
         words.remove(at: index)
     }
     
@@ -116,7 +113,7 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
         guard let cell = collectionView.cellForItem(at: indexPath) as? SelectorCell else {return}
         guard let word = cell.word else {return}
         cell.tapped()
-        delegate?.showWord(word: word)
+        word.show()
     }
     
     //sizing

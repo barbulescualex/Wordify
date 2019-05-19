@@ -13,10 +13,3 @@ public struct Position {
     var direction : Direction?
     var matrixPos : (Int,Int)
 }
-
-///represents a word, with reference to the char cells
-public struct Word : Equatable {
-    var string : String
-    var cells : [CharCell]
-    var found = false
-}

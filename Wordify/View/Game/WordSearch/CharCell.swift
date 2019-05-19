@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CharCell: UIView, UIGestureRecognizerDelegate {
+public class CharCell: UIView, UIGestureRecognizerDelegate {
     //MARK: Vars
     
     ///character the cell holds

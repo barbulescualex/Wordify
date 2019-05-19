@@ -68,10 +68,9 @@ class GameViewController: UIViewController {
         return view
     }()
     
-    private lazy var wordSelectorView : WordSelectorView = {
+    private var wordSelectorView : WordSelectorView = {
         let view = WordSelectorView()
         view.alpha = 0
-        view.delegate = self
         return view
     }()
     
@@ -91,6 +90,10 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         setup()
         setupConstraints()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         animateIn()
     }
 
@@ -215,8 +218,7 @@ class GameViewController: UIViewController {
     }
     
     @objc fileprivate func homePressed(_ sender: UIButton?){
-        endGame()
-        //self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc fileprivate func orientationChanged(){
@@ -240,12 +242,6 @@ class GameViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
-}
-
-extension GameViewController: WordSelectorViewDelegate {
-    func showWord(word: Word) {
-        wordSearchView.showWord(word: word)
-    }
 }
 
 extension GameViewController: WordSearchViewDelegate {

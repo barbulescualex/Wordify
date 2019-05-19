@@ -153,7 +153,7 @@ class Grid{
                 for cell in charCells {
                     cell.isPartOfWord = true
                 }
-                let word = Word(string: string, cells: charCells, found: false)
+                let word = Word(string: string, cells: charCells)
                 words.append(word)
                 
                 if let index = wordsNotAdded.firstIndex(of: string) {
@@ -190,8 +190,8 @@ class Grid{
         array.shuffle()
         //randomize direction (forward backwards)
         array = array.map({ val -> String in
-            let random = Bool.random()
-            if random {
+            let reverse = Bool.random()
+            if reverse {
                 return String(val.reversed())
             } else {
                 return val
