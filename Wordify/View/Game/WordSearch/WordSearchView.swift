@@ -35,6 +35,8 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     ///The highlighted, valid, char cells in order of selection
     var highlightedCells = [CharCell]()
     
+    var selectionFeedBack = UISelectionFeedbackGenerator()
+    
     ///Reference to all the words in the grid
     var words = [Word](){
         didSet{
@@ -85,6 +87,8 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         panRecgonizer.delegate = self
         panRecgonizer.maximumNumberOfTouches = 1
         addGestureRecognizer(panRecgonizer)
+        
+        selectionFeedBack.prepare()
     }
     
     //MARK: Char Operations
@@ -304,6 +308,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
 
         highlightedCells.append(cell)
         cell.addHighlight()
+        selectionFeedBack.selectionChanged()
         return
     }
     

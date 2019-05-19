@@ -14,13 +14,20 @@ class WordSelectorView: UIView {
     public var words = [Word]() {
         didSet{
             collectionView.reloadData()
-            indexPath.item = words.count/2
+            indexPath.item = 0
         }
     }
     
     private var indexPath = IndexPath(item: 0, section: 0) {
         didSet{
-             collectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
+            if words.count == 0 {return}
+            for cell in collectionView.visibleCells {
+                guard let cell = cell as? SelectorCell else {continue}
+                cell.removeFocus()
+            }
+            guard let cell = collectionView.cellForItem(at: indexPath) as? SelectorCell else {return}
+            cell.setInFocus()
+            collectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
         }
     }
     
@@ -117,9 +124,6 @@ class WordSelectorView: UIView {
     
     public func updateScrollDirection(direction : UICollectionView.ScrollDirection){
         layout.scrollDirection = direction
-        if words.count != 0 {
-            indexPath.item = words.count/2
-        }
         switch direction {
             case .horizontal:
                 stackView.axis = .horizontal
@@ -132,22 +136,20 @@ class WordSelectorView: UIView {
         @unknown default:
             print("unkown default in word selector view update word selector view")
         }
+        collectionView.reloadData()
+        indexPath.item = 0
     }
     
     @objc private func back(_ sender: UIButton){
-        let numVisible = collectionView.visibleCells.count
-        let numWords = words.count
-        let newItem = indexPath.item - 1
-        if newItem < numVisible/2 { return }
-        indexPath.item = newItem
+        let newIndex = indexPath.item - 1
+        if newIndex < 0 {return}
+        indexPath.item = newIndex
     }
     
     @objc private func forward(_ sender: UIButton){
-        let numVisible = collectionView.visibleCells.count
-        let numWords = words.count
-        let newItem = indexPath.item + 1
-        if newItem > numWords - 1 - numVisible/2 { return }
-        indexPath.item = newItem
+        let newIndex = indexPath.item + 1
+        if newIndex > words.count-1 {return}
+        indexPath.item = newIndex
     }
 }
 
@@ -164,19 +166,17 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! SelectorCell
         cell.word = words[indexPath.item]
-        cell.delegate = self
+        if indexPath.item == 0 {
+            cell.setInFocus()
+        } else {
+            cell.removeFocus()
+        }
         return cell
     }
     
     //sizing
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 90, height: 40)
-    }
-}
-
-extension WordSelectorView: SelectorCellDelegate {
-    func panned(_ sender: SelectorCell) {
-        
     }
 }
 

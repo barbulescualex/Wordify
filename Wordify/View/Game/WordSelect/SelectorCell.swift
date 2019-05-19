@@ -8,18 +8,12 @@
 
 import UIKit
 
-protocol SelectorCellDelegate : AnyObject {
-    func panned(_ sender: SelectorCell)
-}
-
 class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     public var word : Word? {
         didSet{
             label.text = word?.string
         }
     }
-    
-    weak var delegate : SelectorCellDelegate?
     
     let label : UILabel = {
         let label = UILabel()
@@ -63,7 +57,6 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             sender.cancel()
             animate()
             word?.show()
-            delegate?.panned(self)
         }
     }
     
@@ -79,4 +72,15 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         }
     }
     
+    public func setInFocus(){
+        label.font = UIFont.systemFont(ofSize: 22)
+    }
+    
+    public func removeFocus(){
+        label.font = UIFont.systemFont(ofSize: 17)
+    }
+    
+    deinit {
+        print("Deinit")
+    }
 }

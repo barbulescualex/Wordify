@@ -16,8 +16,8 @@ class GameViewController: UIViewController {
     
     var wordsFound = 0 {
         didSet{
-            wordCountLabel.text = "\(wordsFound)/8"
-            if (wordsFound == 8) {
+            wordCountLabel.text = "\(wordsFound)/\(words.count)"
+            if (wordsFound == words.count) {
                 endGame()
             }
         }
@@ -27,6 +27,7 @@ class GameViewController: UIViewController {
     
     var words = [Word](){
         didSet{
+            wordCountLabel.text = "\(wordsFound)/\(words.count)"
             wordSelectorView.words = words
         }
     }
@@ -37,7 +38,6 @@ class GameViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 30, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.alpha = 0
-        label.text = "0/8"
         label.textColor = UIColor.gray
         label.textAlignment = .center
         return label
