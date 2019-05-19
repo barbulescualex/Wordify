@@ -18,12 +18,13 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    var attributedString : [NSAttributedString.Key]? {
+    var fontSize : CGFloat = 17 {
         didSet{
-            
+            UIView.animate(withDuration: 0.4) {
+                self.charLabel.font = UIFont.systemFont(ofSize: self.fontSize)
+            }
         }
     }
-    
     ///the position it is in the grid matrix (origin is in top left)
     var matrixPos : (Int, Int) = (0,0)
     
@@ -35,6 +36,8 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     
     private var solidifiedColor = UIColor.pink
     private var highlightColor = UIColor.green
+    
+    public var isPartOfWord = false
     
     //Mark: View Components
     private var charLabel : UILabel = {

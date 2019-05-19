@@ -15,27 +15,19 @@ class GameViewController: UIViewController {
     
     var wordsFound = 0 {
         didSet{
-            wordCountLabel.text = "Found: \(wordsFound)/8"
+            wordCountLabel.text = "\(wordsFound)/8"
         }
     }
     
-    //MARK: View Components
-    private var titleLabel : UILabel = {
-        let label = UILabel()
-        label.text = "Wordify"
-        label.font = UIFont.systemFont(ofSize: 30, weight: .heavy)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.alpha = 0
-        label.textColor = UIColor.gray
-        return label
-    }()
+    var size = 10
     
+    //MARK: View Components
     private var wordCountLabel : UILabel = {
         let label = UILabel()
-        label.text = "Found: 0/8"
-        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.alpha = 0
+        label.text = "0/8"
         label.textColor = UIColor.gray
         return label
     }()
@@ -50,8 +42,18 @@ class GameViewController: UIViewController {
         return button
     }()
     
+    private lazy var homeButton : UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "home")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = UIColor.gray
+        button.alpha = 0
+        button.addTarget(self, action: #selector(homePressed(_:)), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     private lazy var wordSearchView : WordSearchView = {
-        let view = WordSearchView(size: 10)
+        let view = WordSearchView(size: self.size)
         view.alpha = 0
         view.delegate = self
         return view
@@ -65,7 +67,8 @@ class GameViewController: UIViewController {
     }()
     
     //MARK: Init
-    required init(){
+    required init(size: Int){
+        self.size = size
         super.init(nibName: nil, bundle: nil)
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
     }
@@ -88,7 +91,7 @@ class GameViewController: UIViewController {
         view.backgroundColor = UIColor.green
         
         //add subviews
-        view.addSubview(titleLabel)
+        view.addSubview(homeButton)
         view.addSubview(wordCountLabel)
         view.addSubview(refreshButton)
         view.addSubview(wordSelectorView)
@@ -97,15 +100,18 @@ class GameViewController: UIViewController {
     
     fileprivate func setupConstraints(){
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
-            titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+            homeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
+            homeButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+            homeButton.heightAnchor.constraint(equalToConstant: 30),
+            homeButton.widthAnchor.constraint(equalToConstant: 30),
             
-            wordCountLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 3),
+            wordCountLabel.topAnchor.constraint(equalTo: homeButton.bottomAnchor, constant: 3),
             wordCountLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
             
             refreshButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
             refreshButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
-            
+            refreshButton.heightAnchor.constraint(equalToConstant: 30),
+            refreshButton.widthAnchor.constraint(equalToConstant: 30),
             
             wordSearchView.heightAnchor.constraint(equalTo: wordSearchView.widthAnchor),
             wordSearchView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
@@ -161,7 +167,7 @@ class GameViewController: UIViewController {
     /// fades views in on viewDidLoad
     fileprivate func animateIn(){
         UIView.animate(withDuration: 0.1, animations: {
-            self.titleLabel.alpha = 1
+            self.homeButton.alpha = 1
             self.refreshButton.alpha = 1
         }) { (_) in
             self.reloadWordSearch(first: true)
@@ -200,11 +206,16 @@ class GameViewController: UIViewController {
         self.wordSelectorView.reset()
     }
     
+    @objc fileprivate func homePressed(_ sender: UIButton?){
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     @objc fileprivate func orientationChanged(){
         updateConstraints()
     }
     
     deinit {
+        print("deinit")
         NotificationCenter.default.removeObserver(self)
     }
 

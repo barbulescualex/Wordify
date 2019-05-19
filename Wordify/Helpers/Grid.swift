@@ -138,7 +138,9 @@ class Grid{
                 }
                 //else conflict, try new candidate placement
                 for cell in charCells { //clear assignments
-                    cell.char =  nil
+                    if !cell.isPartOfWord {
+                        cell.char = nil
+                    }
                 }
                 charCells.removeAll()
                 couldPlace = false
@@ -148,6 +150,9 @@ class Grid{
             if couldPlace {
                 //everything was placed sucessfully
                 placed = true
+                for cell in charCells {
+                    cell.isPartOfWord = true
+                }
                 let word = Word(string: string, cells: charCells, found: false)
                 words.append(word)
                 

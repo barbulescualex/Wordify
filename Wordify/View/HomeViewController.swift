@@ -10,10 +10,10 @@ import UIKit
 import AVFoundation
 
 class HomeViewController: UIViewController {
-    
+    //MARK: Vars
     private var player = AVAudioPlayer()
     private var audioFile = AVAudioFile()
-    
+    private var firstLoad = true
     private var sliderFeedbackGenerator : UIImpactFeedbackGenerator?
     
     private var gridSize = 10 {
@@ -38,6 +38,7 @@ class HomeViewController: UIViewController {
         let string = "wordify"
         for char in string {
             let cell = CharCell(char: char)
+            cell.fontSize = 50
             stack.addArrangedSubview(cell)
         }
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -54,9 +55,10 @@ class HomeViewController: UIViewController {
         button.layer.cornerRadius = 20
         button.clipsToBounds = true
         button.alpha = 0
-        button.contentEdgeInsets = UIEdgeInsets(top: 7, left: 25, bottom: 7, right: 25)
+        button.contentEdgeInsets = UIEdgeInsets(top: 7, left: 50, bottom: 10, right: 50)
         return button
     }()
+    
     
     private lazy var slider: UISlider = {
         let slider = UISlider()
@@ -90,9 +92,6 @@ class HomeViewController: UIViewController {
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.translatesAutoresizingMaskIntoConstraints = false
-//        label.backgroundColor = .white
-//        label.layer.cornerRadius = 15
-//        label.clipsToBounds = true
         label.alpha = 0
         return label
     }()
@@ -112,6 +111,23 @@ class HomeViewController: UIViewController {
         animateInTitle(index: 0)
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        playButton.alpha = 0
+        slider.alpha = 0
+        gridSizeLabel.alpha = 0
+        emojiView.alpha = 0
+        titleStack.alpha = 0
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if firstLoad {
+            firstLoad = false
+        } else {
+            viewDidAppearAnimation()
+        }
+    }
     
     fileprivate func setup(){
         view.backgroundColor = UIColor.offWhite
@@ -141,8 +157,8 @@ class HomeViewController: UIViewController {
         titleStackConstraints = [
             titleStack.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
             titleStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            titleStack.widthAnchor.constraint(equalToConstant: 250),
-            titleStack.heightAnchor.constraint(equalToConstant: 40),
+            titleStack.widthAnchor.constraint(equalToConstant: 320),
+            titleStack.heightAnchor.constraint(equalToConstant: 80),
         ]
         
         NSLayoutConstraint.activate(titleStackConstraints)
@@ -163,19 +179,33 @@ class HomeViewController: UIViewController {
         player.play()
     }
     
+    fileprivate func viewDidAppearAnimation(){
+        UIView.animate(withDuration: 0.4, animations: {
+            self.playButton.alpha = 1
+            self.slider.alpha = 1
+            self.gridSizeLabel.alpha = 1
+            self.emojiView.alpha = 1
+            self.titleStack.alpha = 1
+        })
+    }
+    
     fileprivate func animateIn(){
         NSLayoutConstraint.deactivate(titleStackConstraints)
         
         titleStackConstraints = [
             titleStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             titleStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            titleStack.widthAnchor.constraint(equalToConstant: 175),
-            titleStack.heightAnchor.constraint(equalToConstant: 25),
+            titleStack.widthAnchor.constraint(equalToConstant: 245),
+            titleStack.heightAnchor.constraint(equalToConstant: 35),
         ]
          NSLayoutConstraint.activate(self.titleStackConstraints)
         
         UIView.animate(withDuration: 0.4, animations:  {
            self.view.layoutIfNeeded()
+            for view in self.titleStack.arrangedSubviews {
+                guard let cell = view as? CharCell else {continue}
+                cell.fontSize = 30
+            }
         }){ _ in
             UIView.animate(withDuration: 0.4, animations: {
                 self.playButton.alpha = 1
@@ -194,7 +224,6 @@ class HomeViewController: UIViewController {
         guard let cell = titleStack.arrangedSubviews[index] as? CharCell else {
             return
         }
-        print("animating index: ", index)
         cell.addHighlight()
         DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.25) {
             DispatchQueue.main.sync {
@@ -204,7 +233,14 @@ class HomeViewController: UIViewController {
     }
     
     @objc func play(_ sender: UIButton){
-        
+        UIView.animate(withDuration: 0.3, animations: {
+            sender.backgroundColor = UIColor.green
+        }) { _ in
+            let gameVC = GameViewController(size: self.gridSize)
+            self.present(gameVC, animated: true, completion: {
+                sender.backgroundColor = UIColor.pink
+            })
+        }
     }
     
     @objc func sliderChanged(_ sender: UISlider){
@@ -214,7 +250,6 @@ class HomeViewController: UIViewController {
         if gridSize != size {
             gridSize = size
         }
-
     }
 
 }
