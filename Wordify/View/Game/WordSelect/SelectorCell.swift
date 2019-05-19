@@ -8,12 +8,18 @@
 
 import UIKit
 
+protocol SelectorCellDelegate : AnyObject {
+    func panned(_ sender: SelectorCell)
+}
+
 class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     public var word : Word? {
         didSet{
             label.text = word?.string
         }
     }
+    
+    weak var delegate : SelectorCellDelegate?
     
     let label : UILabel = {
         let label = UILabel()
@@ -33,21 +39,10 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func tapped(){
-        UIView.animate(withDuration: 0.1, animations: {
-            self.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-        }){ _ in
-            UIView.animate(withDuration: 0.05, animations: {
-                self.transform = CGAffineTransform.identity
-            })
-        }
-    }
-    
     fileprivate func setup(){
-        backgroundColor = UIColor.offWhite
-        layer.cornerRadius = 10
-        clipsToBounds = true
         
+        layer.cornerRadius = 10
+
         addSubview(label)
         NSLayoutConstraint.activate([
             label.topAnchor.constraint(equalTo: topAnchor),
@@ -55,6 +50,33 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             label.trailingAnchor.constraint(equalTo: trailingAnchor),
             label.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+        
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(panned(_:)))
+        pan.maximumNumberOfTouches = 1
+        pan.delegate = self
+        
+        addGestureRecognizer(pan)
+    }
+    
+    @objc func panned(_ sender: UIPanGestureRecognizer){
+        if sender.state == .began {
+            sender.cancel()
+            animate()
+            word?.show()
+            delegate?.panned(self)
+        }
+    }
+    
+    private func animate(){
+        UIView.animate(withDuration: 0.3, animations: {
+            self.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            self.label.textColor = UIColor.pink.withAlphaComponent(0.5)
+        }){ _ in
+            UIView.animate(withDuration: 0.2, animations: {
+                self.transform = CGAffineTransform.identity
+                self.label.textColor = UIColor.gray
+            })
+        }
     }
     
 }

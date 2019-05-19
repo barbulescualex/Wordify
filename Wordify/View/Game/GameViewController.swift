@@ -34,7 +34,7 @@ class GameViewController: UIViewController {
     //MARK: View Components
     private var wordCountLabel : UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 25, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 30, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.alpha = 0
         label.text = "0/8"

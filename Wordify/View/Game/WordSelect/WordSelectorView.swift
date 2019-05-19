@@ -13,18 +13,56 @@ class WordSelectorView: UIView {
     private let id = "cell"
     public var words = [Word]() {
         didSet{
-            let array = words.map({$0.string
-            })
-            print(array)
             collectionView.reloadData()
+            indexPath.item = words.count/2
         }
     }
+    
+    private var indexPath = IndexPath(item: 0, section: 0) {
+        didSet{
+             collectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
+        }
+    }
+    
+    let backImage = UIImage(named: "back").resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
+    let forwardImage = UIImage(named: "forward").resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
+    let upImage = UIImage(named: "back").rotate(radians: .pi/2).resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
+    let downImage = UIImage(named: "forward").rotate(radians: .pi/2).resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
+    
 
     //MARK: View Components
+    private var stackView : UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.distribution = .fill
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
+    private lazy var backButton : UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "back")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = UIColor.gray
+        button.addTarget(self, action: #selector(back(_:)), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.imageView?.clipsToBounds = false
+        button.imageView?.contentMode = .center
+        return button
+    }()
+    
+    private lazy var forwardButton : UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "forward")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = UIColor.gray
+        button.addTarget(self, action: #selector(forward(_:)), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     public var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 15
+        layout.minimumInteritemSpacing = 12
         layout.scrollDirection = .horizontal
         return layout
     }()
@@ -34,15 +72,13 @@ class WordSelectorView: UIView {
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.isScrollEnabled = true
+        collectionView.alwaysBounceVertical = true
         collectionView.alwaysBounceHorizontal = true
-        collectionView.alwaysBounceVertical = false
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.allowsMultipleSelection = true
         collectionView.register(SelectorCell.self, forCellWithReuseIdentifier: id)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.allowsMultipleSelection = false
+        collectionView.isScrollEnabled = false
         return collectionView
     }()
 
@@ -59,14 +95,17 @@ class WordSelectorView: UIView {
     //MARK: Setup
     fileprivate func setup(){
         translatesAutoresizingMaskIntoConstraints = false
-        addSubview(collectionView)
+        
+        addSubview(stackView)
+        stackView.addArrangedSubview(backButton)
+        stackView.addArrangedSubview(collectionView)
+        stackView.addArrangedSubview(forwardButton)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
-
+            stackView.topAnchor.constraint(equalTo: topAnchor),
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
     }
     
@@ -78,19 +117,38 @@ class WordSelectorView: UIView {
     
     public func updateScrollDirection(direction : UICollectionView.ScrollDirection){
         layout.scrollDirection = direction
-        
+        if words.count != 0 {
+            indexPath.item = words.count/2
+        }
         switch direction {
             case .horizontal:
-                collectionView.alwaysBounceVertical = false
-                collectionView.alwaysBounceHorizontal = true
+                stackView.axis = .horizontal
+                backButton.setImage(backImage, for: .normal)
+                forwardButton.setImage(forwardImage, for: .normal)
             case .vertical:
-                collectionView.alwaysBounceVertical = true
-                collectionView.alwaysBounceHorizontal = false
+                stackView.axis = .vertical
+                backButton.setImage(upImage, for: .normal)
+                forwardButton.setImage(downImage, for: .normal)
         @unknown default:
             print("unkown default in word selector view update word selector view")
         }
     }
-
+    
+    @objc private func back(_ sender: UIButton){
+        let numVisible = collectionView.visibleCells.count
+        let numWords = words.count
+        let newItem = indexPath.item - 1
+        if newItem < numVisible/2 { return }
+        indexPath.item = newItem
+    }
+    
+    @objc private func forward(_ sender: UIButton){
+        let numVisible = collectionView.visibleCells.count
+        let numWords = words.count
+        let newItem = indexPath.item + 1
+        if newItem > numWords - 1 - numVisible/2 { return }
+        indexPath.item = newItem
+    }
 }
 
 extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
@@ -106,14 +164,8 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! SelectorCell
         cell.word = words[indexPath.item]
+        cell.delegate = self
         return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? SelectorCell else {return}
-        guard let word = cell.word else {return}
-        cell.tapped()
-        word.show()
     }
     
     //sizing
@@ -122,4 +174,9 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     }
 }
 
+extension WordSelectorView: SelectorCellDelegate {
+    func panned(_ sender: SelectorCell) {
+        
+    }
+}
 
