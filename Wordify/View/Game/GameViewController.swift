@@ -40,6 +40,7 @@ class GameViewController: UIViewController {
         label.alpha = 0
         label.textColor = UIColor.gray
         label.textAlignment = .center
+        label.setContentHuggingPriority(.required, for: .vertical)
         return label
     }()
     
@@ -152,8 +153,8 @@ class GameViewController: UIViewController {
             NSLayoutConstraint.activate(wordSelectorViewConstraints)
             
             wordsFoundViewConstraints = [wordCountLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-                                         wordCountLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                                         wordCountLabel.bottomAnchor.constraint(equalTo: wordSearchView.topAnchor),
+                                         wordCountLabel.bottomAnchor.constraint(equalTo: wordSearchView.safeAreaLayoutGuide.topAnchor, constant: -30),
+//                                         wordCountLabel.bottomAnchor.constraint(equalTo: wordSearchView.topAnchor),
                                          ]
             
             NSLayoutConstraint.activate(wordsFoundViewConstraints)
@@ -179,8 +180,8 @@ class GameViewController: UIViewController {
             NSLayoutConstraint.activate(wordSelectorViewConstraints)
             
             wordsFoundViewConstraints = [wordCountLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-                                         wordCountLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-                                         wordCountLabel.trailingAnchor.constraint(equalTo: wordSearchView.safeAreaLayoutGuide.leadingAnchor),
+                                         wordCountLabel.trailingAnchor.constraint(equalTo: wordSearchView.safeAreaLayoutGuide.leadingAnchor, constant: -30),
+//                                         wordCountLabel.trailingAnchor.constraint(equalTo: wordSearchView.safeAreaLayoutGuide.leadingAnchor),
             ]
             
             NSLayoutConstraint.activate(wordsFoundViewConstraints)
