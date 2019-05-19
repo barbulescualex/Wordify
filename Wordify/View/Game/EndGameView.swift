@@ -64,10 +64,14 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
             backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
             backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
             
-            viewArea.topAnchor.constraint(equalTo: topAnchor, constant: 200),
-            viewArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200),
-            viewArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 30),
-            viewArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30)
+//            viewArea.topAnchor.constraint(equalTo: topAnchor, constant: 200),
+//            viewArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200),
+//            viewArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 30),
+//            viewArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30)
+            viewArea.centerXAnchor.constraint(equalTo: centerXAnchor),
+            viewArea.centerYAnchor.constraint(equalTo: centerYAnchor),
+            viewArea.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor),
+            viewArea.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor)
         ])
         
         //tap gesture for background view to close itself
@@ -81,7 +85,7 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.text = "Congratulations!"
-        label.textColor = .white
+        label.textColor = .offWhite
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         
