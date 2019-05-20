@@ -137,7 +137,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
             for _ in 0..<size{
                 i = i + 1
                 let charView = CharCell(char: nil)
-                charView.matrixPos = (i,j)
+                charView.matrixPos = Point(x: i, y: j)
                 cellArray.append(charView)
                 horCharStack.addArrangedSubview(charView)
             }
@@ -273,31 +273,31 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
                 //check for valid direction, if no valid direction return
                 switch direction {
                 case .vertical:
-                    if cell.matrixPos.0 != previousPos.matrixPos.0{
+                    if cell.matrixPos.x != previousPos.matrixPos.x{
                         return //not in same direction
                     } else { //same direction, check if skipped
-                        let diffY = abs(previousPos.matrixPos.1 - cell.matrixPos.1)
+                        let diffY = abs(previousPos.matrixPos.y - cell.matrixPos.y)
                         if diffY > 1 {
                             return
                         }
                         
                     }
                 case .horizontal:
-                    if cell.matrixPos.1 != previousPos.matrixPos.1{
+                    if cell.matrixPos.y != previousPos.matrixPos.y{
                         return//not in same direction
                     } else { //same direction, check if skipped
-                        let diffX = abs(previousPos.matrixPos.0 - cell.matrixPos.0)
+                        let diffX = abs(previousPos.matrixPos.x - cell.matrixPos.x)
                         if diffX > 1 {
                             return
                         }
                     }
                 default : //diagonal
-                    if (cell.matrixPos.0 == previousPos.matrixPos.0
-                        || cell.matrixPos.1 == previousPos.matrixPos.1) {
+                    if (cell.matrixPos.x == previousPos.matrixPos.x
+                        || cell.matrixPos.y == previousPos.matrixPos.y) {
                         return //not diagonal
                     } else { //diagonal, check if right diagonal
-                        let diffX = previousPos.matrixPos.0 - cell.matrixPos.0
-                        let diffY = previousPos.matrixPos.1 - cell.matrixPos.1
+                        let diffX = previousPos.matrixPos.x - cell.matrixPos.x
+                        let diffY = previousPos.matrixPos.y - cell.matrixPos.y
                         
                         if direction == .diagonal_TL_BR {
                             if (diffX != diffY){

@@ -13,7 +13,7 @@ struct Position {
     ///Direction the position is in
     var direction : Direction?
     ///The matrix position
-    var matrixPos : (Int,Int)
+    var matrixPos : Point
 }
 
 ///String with information on the direction of the string value

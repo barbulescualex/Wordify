@@ -27,7 +27,7 @@ class CharCell: UIView, UIGestureRecognizerDelegate {
     }
     
     ///The position it is in the grid matrix (origin is in top left)
-    var matrixPos : (Int, Int) = (0,0)
+    var matrixPos = Point(x: 0, y: 0)
     
     ///Boolean flag to check if it is in a highlighted state
     private(set) var highlighted = false
