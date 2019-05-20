@@ -25,3 +25,8 @@ public struct Rstring : Equatable {
         return value
     }
 }
+
+public struct Point: Hashable {
+    var x: Int
+    var y: Int
+}

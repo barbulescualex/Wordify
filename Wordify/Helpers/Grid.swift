@@ -25,9 +25,12 @@ class Grid{
         
         randomizeArray(&self.wordSet)
         
-        addWords()
-        print(wordsNotAdded)
-        addNotAdded()
+        while(words.count != wordSet.count){
+            clearAll()
+            addWords()
+            addNotAdded()
+        }
+        
         fillRest()
         return words
     }
@@ -116,10 +119,20 @@ class Grid{
         
         var charCells = [CharCell]()
         
+        var memoize = Set<Point>()
+
         while(!placed && maxLoops != 0){
             maxLoops -= 1
             let candidateX = Int.random(in: minX...maxX)
             let candidateY = Int.random(in: minY...maxY)
+            let point = Point(x: candidateX, y: candidateY)
+            
+            if memoize.contains(point){
+                maxLoops+=1
+                continue
+            } else {
+                memoize.insert(point)
+            }
             
             var indexInCellArray = candidateY*sideLength + candidateX
             var couldPlace = true
@@ -156,14 +169,16 @@ class Grid{
                 }
                 let word = Word(string: rstring.nonReversedValue(), cells: charCells)
                 words.append(word)
-                
+            
                 if let index = wordsNotAdded.firstIndex(of: rstring) {
                     wordsNotAdded.remove(at: index)
                 }
             } //else loop again with new random position
         }
         if !placed {
-            wordsNotAdded.append(rstring)
+            if !wordsNotAdded.contains(rstring) {
+                wordsNotAdded.append(rstring)
+            }
         }
         return placed
     }
@@ -183,6 +198,8 @@ class Grid{
         for cell in cellArray {
             cell.char = nil
         }
+        words.removeAll()
+        wordsNotAdded.removeAll()
     }
     
     ///Randomize order and direction of words passed in to populate grid

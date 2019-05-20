@@ -21,6 +21,8 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         label.textAlignment = .center
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.minimumScaleFactor = 0.8
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
     
