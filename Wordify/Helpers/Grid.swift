@@ -30,7 +30,6 @@ class Grid{
             addWords()
             addNotAdded()
         }
-        
         fillRest()
         return words
     }
@@ -111,9 +110,8 @@ class Grid{
     }
     
     private func tryToPlaceWord(minX: Int, minY: Int, maxX: Int, maxY: Int, maximumLoops: Int, indexIncrementor: Int, rstring: Rstring) -> Bool{
-        let charArray = rstring.value.map({$0})
-        
         var placed = false
+        let charArray = rstring.value.map({$0})
         
         var maxLoops = maximumLoops
         
@@ -169,7 +167,6 @@ class Grid{
                 }
                 let word = Word(string: rstring.nonReversedValue(), cells: charCells)
                 words.append(word)
-            
                 if let index = wordsNotAdded.firstIndex(of: rstring) {
                     wordsNotAdded.remove(at: index)
                 }
@@ -194,9 +191,18 @@ class Grid{
         }
     }
     
+    private func cleanCharCells(){
+        for cell in cellArray {
+            if !cell.isPartOfWord {
+                cell.char = nil
+            }
+        }
+    }
+    
     private func clearAll(){
         for cell in cellArray {
             cell.char = nil
+            cell.isPartOfWord = false
         }
         words.removeAll()
         wordsNotAdded.removeAll()
