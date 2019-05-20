@@ -19,11 +19,12 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
     
     var fontSize : CGFloat = 17 {
         didSet{
-            UIView.animate(withDuration: 0.4) {
-                self.charLabel.font = UIFont.systemFont(ofSize: self.fontSize)
-            }
+            UIView.transition(with: charLabel, duration: 0.4, options: .transitionCrossDissolve, animations: {
+                 self.charLabel.font = UIFont.systemFont(ofSize: self.fontSize)
+            })
         }
     }
+    
     ///the position it is in the grid matrix (origin is in top left)
     var matrixPos : (Int, Int) = (0,0)
     
@@ -46,6 +47,8 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
         label.numberOfLines = 1
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
+        label.minimumScaleFactor = 0.9
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
     

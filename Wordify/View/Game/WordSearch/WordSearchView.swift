@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 protocol WordSearchViewDelegate: AnyObject {
     func foundWord(word: Word)
@@ -37,6 +38,8 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     
     var selectionFeedBack = UISelectionFeedbackGenerator()
     
+    var player = AVAudioPlayer()
+    
     ///Reference to all the words in the grid
     var words = [Word](){
         didSet{
@@ -60,6 +63,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         self.size = size
         super.init(frame: .zero)
         setup()
+        setupPlayer()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -90,6 +94,17 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         
         selectionFeedBack.prepare()
     }
+    
+    fileprivate func setupPlayer(){
+        guard let url = Bundle.main.url(forResource: "selection", withExtension: "mp3") else {return}
+        do {
+            player = try AVAudioPlayer(contentsOf: url)
+        } catch {
+            print(error)
+        }
+        player.prepareToPlay()
+    }
+    
     
     //MARK: Char Operations
     
@@ -209,6 +224,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
             if ( word.string == candidateWord || word.string == reversedCandidateWord ) && !word.found {
                 found = true
                 words[i].found = true
+                player.play()
                 delegate?.foundWord(word: word)
             }
         }

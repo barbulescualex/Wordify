@@ -166,7 +166,7 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! SelectorCell
         cell.word = words[indexPath.item]
-        if indexPath.item == 0 {
+        if indexPath.item == 0 && self.indexPath.item == 0 {
             cell.setInFocus()
         } else {
             cell.removeFocus()

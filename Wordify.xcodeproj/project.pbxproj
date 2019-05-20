@@ -25,6 +25,8 @@
 		FA1B03BA2290D3F80005925F /* sunny.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FA1B03B92290D3F80005925F /* sunny.mp3 */; };
 		FA20CA0A2291BF6000B1DD46 /* EndGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA20CA092291BF6000B1DD46 /* EndGameView.swift */; };
 		FA20CA0F2291D2A100B1DD46 /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA20CA0E2291D2A100B1DD46 /* Word.swift */; };
+		FA20CA112292394300B1DD46 /* hey.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FA20CA102292394300B1DD46 /* hey.mp3 */; };
+		FA20CA1B22923E1500B1DD46 /* selection.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FA20CA1A22923E1500B1DD46 /* selection.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,8 @@
 		FA1B03B92290D3F80005925F /* sunny.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sunny.mp3; sourceTree = "<group>"; };
 		FA20CA092291BF6000B1DD46 /* EndGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndGameView.swift; sourceTree = "<group>"; };
 		FA20CA0E2291D2A100B1DD46 /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
+		FA20CA102292394300B1DD46 /* hey.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = hey.mp3; sourceTree = "<group>"; };
+		FA20CA1A22923E1500B1DD46 /* selection.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = selection.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +136,8 @@
 		FA1B03B62290D3CB0005925F /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				FA20CA1A22923E1500B1DD46 /* selection.mp3 */,
+				FA20CA102292394300B1DD46 /* hey.mp3 */,
 				FA1B03B92290D3F80005925F /* sunny.mp3 */,
 				FA1B03B72290D3F10005925F /* buddy.mp3 */,
 			);
@@ -227,7 +233,9 @@
 			files = (
 				FA1B03BA2290D3F80005925F /* sunny.mp3 in Resources */,
 				FA1B03932289AD8C0005925F /* LaunchScreen.storyboard in Resources */,
+				FA20CA112292394300B1DD46 /* hey.mp3 in Resources */,
 				FA1B03902289AD8C0005925F /* Assets.xcassets in Resources */,
+				FA20CA1B22923E1500B1DD46 /* selection.mp3 in Resources */,
 				FA1B03B82290D3F10005925F /* buddy.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -12,7 +12,6 @@ import AVFoundation
 class HomeViewController: UIViewController {
     //MARK: Vars
     private var player = AVAudioPlayer()
-    private var audioFile = AVAudioFile()
     private var firstLoad = true
     private var sliderFeedbackGenerator : UIImpactFeedbackGenerator?
     
@@ -39,7 +38,7 @@ class HomeViewController: UIViewController {
         let string = "wordify"
         for char in string {
             let cell = CharCell(char: char)
-            cell.fontSize = 50
+            cell.fontSize = 40
             stack.addArrangedSubview(cell)
         }
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -143,7 +142,7 @@ class HomeViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             playButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            playButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            playButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
             
             slider.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             slider.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
@@ -178,6 +177,7 @@ class HomeViewController: UIViewController {
             print(error)
         }
         player.prepareToPlay()
+        player.volume = 0.4
         player.numberOfLoops = -1
         player.play()
     }
@@ -194,12 +194,13 @@ class HomeViewController: UIViewController {
         ]
         NSLayoutConstraint.activate(self.titleStackConstraints)
         
+        for view in self.titleStack.arrangedSubviews {
+            guard let cell = view as? CharCell else {continue}
+            cell.fontSize = 30
+        }
+        
         UIView.animate(withDuration: 0.4, animations:  {
             self.view.layoutIfNeeded()
-            for view in self.titleStack.arrangedSubviews {
-                guard let cell = view as? CharCell else {continue}
-                cell.fontSize = 30
-            }
         }){ _ in
             UIView.animate(withDuration: 0.4, animations: {
                 self.playButton.alpha = 1
@@ -242,6 +243,7 @@ class HomeViewController: UIViewController {
             sender.backgroundColor = UIColor.green
         }) { _ in
             let gameVC = GameViewController(size: self.gridSize)
+            gameVC.delegate = self
             self.present(gameVC, animated: true, completion: {
                 sender.backgroundColor = UIColor.pink
             })
@@ -255,6 +257,19 @@ class HomeViewController: UIViewController {
         if gridSize != size {
             gridSize = size
         }
+    }
+
+}
+
+extension HomeViewController : GameViewControllerDelegate {
+    func stopPlaying() {
+        player.stop()
+        player.prepareToPlay()
+        player.currentTime = 0
+    }
+    
+    func startPlaying() {
+        player.play()
     }
 
 }

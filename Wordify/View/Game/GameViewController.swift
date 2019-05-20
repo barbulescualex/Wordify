@@ -7,9 +7,16 @@
 //
 
 import UIKit
+import AVFoundation
+
+protocol GameViewControllerDelegate: AnyObject {
+    func stopPlaying()
+    func startPlaying()
+}
 
 class GameViewController: UIViewController {
     //MARK: Vars
+    private var player = AVAudioPlayer()
     var wordSearchViewWidthAnchor : NSLayoutConstraint?
     var wordSelectorViewConstraints = [NSLayoutConstraint]()
     var wordsFoundViewConstraints = [NSLayoutConstraint]()
@@ -32,6 +39,8 @@ class GameViewController: UIViewController {
         }
     }
     
+    weak var delegate : GameViewControllerDelegate?
+
     //MARK: View Components
     private var wordCountLabel : UILabel = {
         let label = UILabel()
@@ -82,6 +91,7 @@ class GameViewController: UIViewController {
         self.size = size
         super.init(nibName: nil, bundle: nil)
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        setupPlayer()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -154,7 +164,6 @@ class GameViewController: UIViewController {
             
             wordsFoundViewConstraints = [wordCountLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
                                          wordCountLabel.bottomAnchor.constraint(equalTo: wordSearchView.safeAreaLayoutGuide.topAnchor, constant: -30),
-//                                         wordCountLabel.bottomAnchor.constraint(equalTo: wordSearchView.topAnchor),
                                          ]
             
             NSLayoutConstraint.activate(wordsFoundViewConstraints)
@@ -181,13 +190,23 @@ class GameViewController: UIViewController {
             
             wordsFoundViewConstraints = [wordCountLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
                                          wordCountLabel.trailingAnchor.constraint(equalTo: wordSearchView.safeAreaLayoutGuide.leadingAnchor, constant: -30),
-//                                         wordCountLabel.trailingAnchor.constraint(equalTo: wordSearchView.safeAreaLayoutGuide.leadingAnchor),
             ]
             
             NSLayoutConstraint.activate(wordsFoundViewConstraints)
             
             wordSelectorView.updateScrollDirection(direction: .vertical)
         }
+    }
+    
+    fileprivate func setupPlayer(){
+        guard let url = Bundle.main.url(forResource: "hey", withExtension: "mp3") else {return}
+        do {
+            player = try AVAudioPlayer(contentsOf: url)
+        } catch {
+            print(error)
+        }
+        player.prepareToPlay()
+        player.numberOfLoops = -1
     }
     
     //MARK: Animations
@@ -233,7 +252,8 @@ class GameViewController: UIViewController {
     }
     
     @objc fileprivate func homePressed(_ sender: UIButton?){
-        self.dismiss(animated: true, completion: nil)
+        endGame()
+//        self.dismiss(animated: true, completion: nil)
     }
     
     @objc fileprivate func orientationChanged(){
@@ -241,6 +261,8 @@ class GameViewController: UIViewController {
     }
     
     fileprivate func endGame(){
+        delegate?.stopPlaying()
+        player.play()
         let endView = EndGameView()
         endView.delegate = self
         view.addSubview(endView)
@@ -272,6 +294,10 @@ extension GameViewController: WordSearchViewDelegate {
 
 extension GameViewController: EndGameViewDelegate {
     func closeView(_ sender: EndGameView) {
+        player.stop()
+        player.currentTime = 0
+        delegate?.startPlaying()
+        player.prepareToPlay()
         sender.removeFromSuperview()
         reloadWordSearch(first: false)
     }
