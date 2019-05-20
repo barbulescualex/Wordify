@@ -252,8 +252,7 @@ class GameViewController: UIViewController {
     }
     
     @objc fileprivate func homePressed(_ sender: UIButton?){
-        endGame()
-//        self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc fileprivate func orientationChanged(){
