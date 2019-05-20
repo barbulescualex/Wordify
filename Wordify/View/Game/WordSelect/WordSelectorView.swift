@@ -8,36 +8,51 @@
 
 import UIKit
 
+///View to show the words left to find and reveal them on the grid
 class WordSelectorView: UIView {
     //MARS: Vars
+    
+    ///Cell reuse identifier
     private let id = "cell"
+    
+    ///Words the view holds
     public var words = [Word]() {
         didSet{
+            ///reload data and shown index
             collectionView.reloadData()
             indexPath.item = 0
         }
     }
     
+    ///The indexPath for the cell in focus
     private var indexPath = IndexPath(item: 0, section: 0) {
         didSet{
-            if words.count == 0 {return}
+            if words.count == 0 {return} //nothing to do
+            
+            //remove focus
             for cell in collectionView.visibleCells {
-                guard let cell = cell as? SelectorCell else {continue}
+                guard let cell = cell as? WordCell else {continue}
                 cell.removeFocus()
             }
-            guard let cell = collectionView.cellForItem(at: indexPath) as? SelectorCell else {return}
+            
+            //set new cell at indexPath in focus
+            guard let cell = collectionView.cellForItem(at: indexPath) as? WordCell else {return}
             cell.setInFocus()
+            
+            //Scroll collectionView to new cell in focus
             collectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
         }
     }
     
-    let backImage = UIImage(named: "back").resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
-    let forwardImage = UIImage(named: "forward").resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
-    let upImage = UIImage(named: "back").rotate(radians: .pi/2).resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
-    let downImage = UIImage(named: "forward").rotate(radians: .pi/2).resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
+    //Arrow images in all orientations
+    private let backImage = UIImage(named: "back").resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
+    private let forwardImage = UIImage(named: "forward").resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
+    private let upImage = UIImage(named: "back").rotate(radians: .pi/2).resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
+    private let downImage = UIImage(named: "forward").rotate(radians: .pi/2).resize(targetSize: CGSize(width: 30, height: 30))?.withRenderingMode(.alwaysTemplate)
     
 
     //MARK: View Components
+    ///Stack that holds all the elements in the view
     private var stackView : UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -46,6 +61,7 @@ class WordSelectorView: UIView {
         return stack
     }()
     
+    ///Back button to scroll back in collection view
     private lazy var backButton : UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "back")?.withRenderingMode(.alwaysTemplate), for: .normal)
@@ -57,6 +73,7 @@ class WordSelectorView: UIView {
         return button
     }()
     
+    ///Forward button to scroll back in collection view
     private lazy var forwardButton : UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "forward")?.withRenderingMode(.alwaysTemplate), for: .normal)
@@ -66,7 +83,8 @@ class WordSelectorView: UIView {
         return button
     }()
     
-    public var layout: UICollectionViewFlowLayout = {
+    ///Layout for collection view
+    private var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 12
@@ -74,7 +92,8 @@ class WordSelectorView: UIView {
         return layout
     }()
     
-    public lazy var collectionView : UICollectionView = {
+    ///Collection view that holds word cells
+    private lazy var collectionView : UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
@@ -83,7 +102,7 @@ class WordSelectorView: UIView {
         collectionView.alwaysBounceHorizontal = true
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(SelectorCell.self, forCellWithReuseIdentifier: id)
+        collectionView.register(WordCell.self, forCellWithReuseIdentifier: id)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.isScrollEnabled = false
         return collectionView
@@ -100,14 +119,19 @@ class WordSelectorView: UIView {
     }
     
     //MARK: Setup
-    fileprivate func setup(){
+    
+    ///sets up the views
+    private func setup(){
+        //properties
         translatesAutoresizingMaskIntoConstraints = false
         
+        //subviews
         addSubview(stackView)
         stackView.addArrangedSubview(backButton)
         stackView.addArrangedSubview(collectionView)
         stackView.addArrangedSubview(forwardButton)
         
+        //constraints
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: topAnchor),
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -117,12 +141,15 @@ class WordSelectorView: UIView {
     }
     
     //MARK: Functions
+    
+    ///Tries to remove a specific word form the selector view
     public func removeWordFromSelection(word: Word){
-        guard let index = words.firstIndex(of: word) else {print("word index NOT found");return}
+        guard let index = words.firstIndex(of: word) else { return }
         words.remove(at: index)
     }
     
-    public func updateScrollDirection(direction : UICollectionView.ScrollDirection){
+    ///Update the view to new orientation layout
+    public func updateOrientation(direction : UICollectionView.ScrollDirection){
         layout.scrollDirection = direction
         switch direction {
             case .horizontal:
@@ -140,12 +167,16 @@ class WordSelectorView: UIView {
         indexPath.item = 0
     }
     
+    //MARK: Event Handlers
+    
+    ///Back button handler, scrolls the collection view back
     @objc private func back(_ sender: UIButton){
         let newIndex = indexPath.item - 1
         if newIndex < 0 {return}
         indexPath.item = newIndex
     }
     
+    ///Forward button handler, scrolls the collection view forward
     @objc private func forward(_ sender: UIButton){
         let newIndex = indexPath.item + 1
         if newIndex > words.count-1 {return}
@@ -164,7 +195,7 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! SelectorCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! WordCell
         cell.word = words[indexPath.item]
         if indexPath.item == 0 && self.indexPath.item == 0 {
             cell.setInFocus()

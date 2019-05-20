@@ -8,16 +8,17 @@
 
 import UIKit
 
-public class CharCell: UIView, UIGestureRecognizerDelegate {
+class CharCell: UIView, UIGestureRecognizerDelegate {
     //MARK: Vars
     ///character the cell holds
-    var char : Character? {
+    public var char : Character? {
         didSet{
            updateChar()
         }
     }
     
-    var fontSize : CGFloat = 17 {
+    ///Font size of character in cell
+    public var fontSize : CGFloat = 17 {
         didSet{
             UIView.transition(with: charLabel, duration: 0.4, options: .transitionCrossDissolve, animations: {
                  self.charLabel.font = UIFont.systemFont(ofSize: self.fontSize)
@@ -25,21 +26,25 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    ///the position it is in the grid matrix (origin is in top left)
+    ///The position it is in the grid matrix (origin is in top left)
     var matrixPos : (Int, Int) = (0,0)
     
-    ///boolean flag to check if it is in a highlighted state
+    ///Boolean flag to check if it is in a highlighted state
     private(set) var highlighted = false
     
-    //boolean flag to indify that this cell was part of a valid and found string
+    ///Boolean flag to indify that this cell was part of a valid and found string
     private(set) var solidified = false
     
+    ///Colors to for different states
     private var solidifiedColor = UIColor.pink
     private var highlightColor = UIColor.green
     
+    ///Flag set by Grid population algorithm to detect if the corresponding cell is part of a word
     public var isPartOfWord = false
     
     //Mark: View Components
+    
+    ///Label that holds the character
     private var charLabel : UILabel = {
         let label = UILabel()
         label.textColor = UIColor.gray
@@ -67,6 +72,10 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
     fileprivate func setup(){
         //properties
         translatesAutoresizingMaskIntoConstraints = false
+        layer.cornerRadius = 5
+        clipsToBounds = false
+        layer.borderWidth = 2
+        layer.borderColor = UIColor.clear.cgColor
         
         //children
         addSubview(charLabel)
@@ -81,12 +90,6 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
             widthAnchor.constraint(equalTo: heightAnchor),
             heightAnchor.constraint(equalTo: widthAnchor)
         ])
-        
-        //view properties
-        layer.cornerRadius = 5
-        clipsToBounds = false
-        layer.borderWidth = 2
-        layer.borderColor = UIColor.clear.cgColor
     }
     
     //MARK: State Functions
@@ -117,7 +120,7 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
                 self.charLabel.textColor = self.solidified ? UIColor.offWhite : UIColor.gray
                 self.backgroundColor = self.solidified ? self.solidifiedColor : UIColor.clear
             }
-//            highlighted = false
+            highlighted = false
         }
     }
     
@@ -147,6 +150,7 @@ public class CharCell: UIView, UIGestureRecognizerDelegate {
         highlighted = false
     }
     
+    ///Flashes the cell to reveal itself as part of a word in the WordSearchView
     public func show(){
         UIView.animate(withDuration: 0.3, animations: {
             self.charLabel.textColor = UIColor.white

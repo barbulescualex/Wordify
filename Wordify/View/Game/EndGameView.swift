@@ -8,23 +8,30 @@
 
 import UIKit
 
+///Protocol to communicate with parent that the user is exiting the modal
 protocol EndGameViewDelegate : AnyObject {
+    ///Request the delegate to remove the EndGameView
     func closeView(_ sender: EndGameView)
 }
 
-public class EndGameView : UIView, UIGestureRecognizerDelegate {
+///View modal for end game state
+class EndGameView : UIView, UIGestureRecognizerDelegate {
     //MARK: Vars
+    
+    ///Delegate to implement the EndGameViewDelegate protocol
     weak var delegate : EndGameViewDelegate?
     
     //MARK: View Components
-    private let backgroundView : UIView = { //transparent overlay
+    //transparent overlay
+    private let backgroundView : UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.isUserInteractionEnabled = true
         return view
     }()
     
-    private let viewArea : UIView =  { //display area
+    //display area
+    private let viewArea : UIView =  {
         let view = UIView()
         view.layer.cornerRadius = 10
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -49,25 +56,23 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
     }
     
     //MARK: Setup
-    fileprivate func setupView(){
+    ///Sets up view
+    private func setupView(){
         translatesAutoresizingMaskIntoConstraints = false
         //for pop up look
         layer.zPosition = 100
-        clipsToBounds = true
         
+        //add subviews
         addSubview(backgroundView)
         addSubview(viewArea)
         
+        //add constraints for parent subviews
         NSLayoutConstraint.activate([
             backgroundView.topAnchor.constraint(equalTo: topAnchor),
             backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor),
             backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
             backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            
-//            viewArea.topAnchor.constraint(equalTo: topAnchor, constant: 200),
-//            viewArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200),
-//            viewArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 30),
-//            viewArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30)
+        
             viewArea.centerXAnchor.constraint(equalTo: centerXAnchor),
             viewArea.centerYAnchor.constraint(equalTo: centerYAnchor),
             viewArea.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor),
@@ -80,7 +85,8 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
         backgroundView.addGestureRecognizer(tap)
     }
     
-    fileprivate func populateViewArea(){
+    ///Populate the content inside the viewArea
+    private func populateViewArea(){
         //title label
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 30)
@@ -128,7 +134,9 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
     }
     
     //MARK: Animations
-    fileprivate func showAnimate(){
+    
+    //Animate in, popping effect
+    private func showAnimate(){
         viewArea.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         viewArea.alpha = 0.0
         UIView.animate(withDuration: 0.125, animations: {
@@ -142,6 +150,7 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
         })
     }
     
+    //Animate out, drop effect
     fileprivate func leaveAnimate(){
         UIView.animate(withDuration: 0.1, animations: {
             self.viewArea.frame = CGRect(x: 0, y: 2000, width: self.viewArea.frame.size.width, height: self.viewArea.frame.size.height)
@@ -152,6 +161,8 @@ public class EndGameView : UIView, UIGestureRecognizerDelegate {
     }
     
     //MARK: Event Handlers
+    
+    ///Handler for gesture recognizer on the background view
     @objc func outsidePressed(_ sender: UIGestureRecognizer){
         leaveAnimate()
     }

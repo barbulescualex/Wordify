@@ -8,7 +8,9 @@
 
 import Foundation
 
+///Data model for the application
 class Data {
+    ///Avaiable words for the word search view
     static let words = [
         "swift",
         "kotlin",
@@ -20,6 +22,7 @@ class Data {
         "ios"
     ]
     
+    ///Returns random lower case character
     static var randomChar : Character? {
         let randomChars = "abcdefghijklmnopqrstuvwxyz"
         return randomChars.randomElement()

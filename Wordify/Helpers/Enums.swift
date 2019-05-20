@@ -8,11 +8,10 @@
 
 import Foundation
 
-///Specifies direction a highlight should occur in
-public enum Direction : Int {
+///Specifies direction in the WordSearchView
+enum Direction : Int {
     case horizontal
     case vertical
-//    case diagonal
     case diagonal_TL_BR //inbetween top left and bottom right
     case diagonal_TR_BL //inbetween top right and bottom left
 }

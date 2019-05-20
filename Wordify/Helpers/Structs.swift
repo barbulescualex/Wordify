@@ -9,15 +9,22 @@
 import Foundation
 
 ///Specifies the positon of an object inside a matrix and the direction it was highlighted in
-public struct Position {
+struct Position {
+    ///Direction the position is in
     var direction : Direction?
+    ///The matrix position
     var matrixPos : (Int,Int)
 }
 
-public struct Rstring : Equatable {
+///String with information on the direction of the string value
+struct Rstring : Equatable {
+    ///Value of string (not gauranteed to be in forward direction)
     var value : String
+    
+    ///Flag to check if the string is reversed or not
     var reversed : Bool
     
+    ///Returns string in proper direction
     public func nonReversedValue() -> String {
         if reversed {
             return String(value.reversed())
@@ -26,7 +33,9 @@ public struct Rstring : Equatable {
     }
 }
 
-public struct Point: Hashable {
+///Point in a matrix
+//Why I chose not to use a CGPoint: https://codereview.stackexchange.com/questions/148763/extending-cgpoint-to-conform-to-hashable
+struct Point: Hashable {
     var x: Int
     var y: Int
 }

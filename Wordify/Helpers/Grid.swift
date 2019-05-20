@@ -10,37 +10,53 @@ import UIKit
 
 class Grid{
     //MARK: Vars
-    private var wordsIn = 0
+    
+    ///Reference to all the CharCells in the grid
     private var cellArray = [CharCell]()
+    
+    ///Sidelength of the grid
     private var sideLength = 0
-    private var words = [Word]()
-    private var wordsNotAdded = [Rstring]()
+    
+    ///Strings to use to populate grid
     private var wordSet = [Rstring]()
+    
+    ///Words in grid
+    private var words = [Word]()
+    
+    ///words not added in after a run of trying to place strings
+    private var wordsNotAdded = [Rstring]()
     
     //MARK: Entrance
     public func populateGrid(sideLength: Int, wordSet: [String], cellArray: [CharCell]) -> [Word]{
         self.sideLength = sideLength
         self.cellArray = cellArray
-        self.wordSet = wordSet.map({Rstring(value: $0, reversed: false)})
+        self.wordSet = wordSet.map({Rstring(value: $0, reversed: false)}) //convert strings to Rstrings
         
+        //randomize order and direction
         randomizeArray(&self.wordSet)
         
+        //keep trying to place words until all words are in
         while(words.count != wordSet.count){
             clearAll()
             addWords()
             addNotAdded()
         }
+        //fill empty cells
         fillRest()
+        
         return words
     }
     
     //MARK: Adding Words
+    
+    ///Will try and add in strings from the wordSet
     private func addWords(){
         for word in wordSet {
             _ = addWord(rstring: word, direction: nil)
         }
     }
     
+    ///Will try and add in words in that failed from addWords() by manually trying each direction
     private func addNotAdded(){
         for word in wordsNotAdded {
             if(addWord(rstring: word, direction: .horizontal)) {
@@ -58,19 +74,25 @@ class Grid{
         }
     }
     
+    ///Prepares constraints for adding a word based off of the direction and size
     private func addWord(rstring: Rstring, direction: Direction?) -> Bool{
         //random direction to place the word in
         let dir = (direction == nil) ? Direction(rawValue: Int.random(in: 0...3)) ?? .horizontal : direction!
         let sizeOfWord = rstring.value.count
         
         //constraints and parameters for how we'll try to place the word
+        
+        //these coordinates represent a rectangle of possible starting positions
         var minX = 0
         var minY = 0
         
         var maxX = 0
         var maxY = 0
         
+        //the area of the rectangle (the number of possible starting positions)
         var maxLoops = 0
+        
+        //increment size for moving to the next char cell in the direction
         var indexIncrementer = 0
         
         switch dir {
@@ -89,7 +111,7 @@ class Grid{
                 maxLoops = (maxY+1)*(maxX+1)
                 indexIncrementer = sideLength
             case .diagonal_TL_BR:
-                let startingCornerPoint = sideLength - sizeOfWord //will make square with the origin point of possible starting positions
+                let startingCornerPoint = sideLength - sizeOfWord
                 minY = 0
                 minX = 0
                 maxX = startingCornerPoint
@@ -97,7 +119,7 @@ class Grid{
                 maxLoops = (maxY+1)*(maxX+1)
                 indexIncrementer = sideLength + 1
             case .diagonal_TR_BL:
-                let startingCornerPoint = sideLength - sizeOfWord //will make square with the origin point of possible starting positions
+                let startingCornerPoint = sideLength - sizeOfWord
                 minY = 0
                 maxX = sideLength - 1
                 minX = sideLength - 1 - startingCornerPoint
@@ -105,18 +127,21 @@ class Grid{
                 maxLoops = (maxY+1)*(sideLength-minX)
                 indexIncrementer = sideLength - 1
         }
-        
+
         return tryToPlaceWord(minX: minX, minY: minY, maxX: maxX, maxY: maxY, maximumLoops: maxLoops, indexIncrementor: indexIncrementer, rstring: rstring)
     }
     
+    ///Tries all positions within constraint to place the word, returns true if the word was placed in sucessfully
     private func tryToPlaceWord(minX: Int, minY: Int, maxX: Int, maxY: Int, maximumLoops: Int, indexIncrementor: Int, rstring: Rstring) -> Bool{
         var placed = false
         let charArray = rstring.value.map({$0})
         
         var maxLoops = maximumLoops
         
+        //the cells that will hold the word if it could be placed
         var charCells = [CharCell]()
         
+        //set of already visited points
         var memoize = Set<Point>()
 
         while(!placed && maxLoops != 0){
@@ -125,14 +150,14 @@ class Grid{
             let candidateY = Int.random(in: minY...maxY)
             let point = Point(x: candidateX, y: candidateY)
             
-            if memoize.contains(point){
+            if memoize.contains(point){ //try again
                 maxLoops+=1
                 continue
             } else {
                 memoize.insert(point)
             }
             
-            var indexInCellArray = candidateY*sideLength + candidateX
+            var indexInCellArray = candidateY*sideLength + candidateX //starting cell
             var couldPlace = true
             
             for char in charArray {
@@ -191,14 +216,7 @@ class Grid{
         }
     }
     
-    private func cleanCharCells(){
-        for cell in cellArray {
-            if !cell.isPartOfWord {
-                cell.char = nil
-            }
-        }
-    }
-    
+    ///Reset all cells
     private func clearAll(){
         for cell in cellArray {
             cell.char = nil

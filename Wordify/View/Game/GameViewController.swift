@@ -9,39 +9,56 @@
 import UIKit
 import AVFoundation
 
-protocol GameViewControllerDelegate: AnyObject {
+///Protocol to communicate with parent to pause/start the master soundtrack
+protocol GameViewControllerSoundDelegate: AnyObject {
+    //Requests that delegate stops playing soundtrack
     func stopPlaying()
+    //Requests that delegate starts playing soundtrack
     func startPlaying()
 }
 
+///Master controller for the word search game
 class GameViewController: UIViewController {
     //MARK: Vars
-    private var player = AVAudioPlayer()
-    var wordSearchViewWidthAnchor : NSLayoutConstraint?
-    var wordSelectorViewConstraints = [NSLayoutConstraint]()
-    var wordsFoundViewConstraints = [NSLayoutConstraint]()
     
-    var wordsFound = 0 {
+    ///Audio player for won game soundtrack
+    private var player = AVAudioPlayer()
+    
+    ///Reference to constraints to change with orientation
+    private var wordSearchViewWidthAnchor : NSLayoutConstraint?
+    private var wordSelectorViewConstraints = [NSLayoutConstraint]()
+    private var wordsFoundViewConstraints = [NSLayoutConstraint]()
+    
+    ///The number of words the player has found
+    private var wordsFound = 0 {
         didSet{
+            //update wordcount label
             wordCountLabel.text = "\(wordsFound)/\(words.count)"
+            //intiate end game state if appropriate
             if (wordsFound == words.count) {
                 endGame()
             }
         }
     }
     
-    var size = 10
+    ///The size of the grid, defualts to 10, updated upon instantiation from HomeViewController
+    private var size = 10
     
-    var words = [Word](){
+    ///A reference to the words in the WordSearchView
+    private var words = [Word](){
         didSet{
             wordCountLabel.text = "\(wordsFound)/\(words.count)"
+            //update words in word selector view
             wordSelectorView.words = words
         }
     }
     
-    weak var delegate : GameViewControllerDelegate?
+    ///Delegate to implement the GameViewControllerSoundDelegate protocol
+    public weak var soundDelegate : GameViewControllerSoundDelegate?
 
     //MARK: View Components
+    
+    ///Label to display how many words the player has found
     private var wordCountLabel : UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 30, weight: .bold)
@@ -53,6 +70,7 @@ class GameViewController: UIViewController {
         return label
     }()
     
+    ///Refresh button to restart game
     private lazy var refreshButton : UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "refresh")?.withRenderingMode(.alwaysTemplate), for: .normal)
@@ -63,6 +81,7 @@ class GameViewController: UIViewController {
         return button
     }()
     
+    ///Home button to dismiss the GameViewController
     private lazy var homeButton : UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "home")?.withRenderingMode(.alwaysTemplate), for: .normal)
@@ -73,6 +92,7 @@ class GameViewController: UIViewController {
         return button
     }()
     
+    ///WordSearchView
     private lazy var wordSearchView : WordSearchView = {
         let view = WordSearchView(size: self.size)
         view.alpha = 0
@@ -80,6 +100,7 @@ class GameViewController: UIViewController {
         return view
     }()
     
+    ///WordSelectorView
     private var wordSelectorView : WordSelectorView = {
         let view = WordSelectorView()
         view.alpha = 0
@@ -111,8 +132,10 @@ class GameViewController: UIViewController {
     }
 
     //MARK: Setup
-    fileprivate func setup(){
-         NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
+    
+    ///Adds subviews, view proprties and registers for notifications
+    private func setup(){
+        //properties
         view.backgroundColor = UIColor.green
         
         //add subviews
@@ -121,9 +144,13 @@ class GameViewController: UIViewController {
         view.addSubview(refreshButton)
         view.addSubview(wordSelectorView)
         view.addSubview(wordSearchView)
+        
+        //notifications
+        NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
-    fileprivate func setupConstraints(){
+    ///Sets initial constraints
+    private func setupConstraints(){
         NSLayoutConstraint.activate([
             homeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
             homeButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
@@ -143,7 +170,8 @@ class GameViewController: UIViewController {
         updateConstraints()
     }
     
-    fileprivate func updateConstraints(){
+    ///Updates constraints based on orientation
+    private func updateConstraints(){
         //clear previous
         wordSearchViewWidthAnchor?.isActive = false
         NSLayoutConstraint.deactivate(wordSelectorViewConstraints)
@@ -168,7 +196,8 @@ class GameViewController: UIViewController {
             
             NSLayoutConstraint.activate(wordsFoundViewConstraints)
             
-            wordSelectorView.updateScrollDirection(direction: .horizontal)
+            //Update word selector view orientation state
+            wordSelectorView.updateOrientation(direction: .horizontal)
         } else { //lanscape
             //padding
             var bottomPadding = view.safeAreaInsets.bottom
@@ -194,11 +223,13 @@ class GameViewController: UIViewController {
             
             NSLayoutConstraint.activate(wordsFoundViewConstraints)
             
-            wordSelectorView.updateScrollDirection(direction: .vertical)
+            //Update word selector view orientation state
+            wordSelectorView.updateOrientation(direction: .vertical)
         }
     }
     
-    fileprivate func setupPlayer(){
+    ///Instantiate and prepare player for end game state sound
+    private func setupPlayer(){
         guard let url = Bundle.main.url(forResource: "hey", withExtension: "mp3") else {return}
         do {
             player = try AVAudioPlayer(contentsOf: url)
@@ -210,8 +241,9 @@ class GameViewController: UIViewController {
     }
     
     //MARK: Animations
-    /// fades views in on viewDidLoad
-    fileprivate func animateIn(){
+    
+    ///Fades views in on viewDidLoad
+    private func animateIn(){
         UIView.animate(withDuration: 0.1, animations: {
             self.homeButton.alpha = 1
             self.refreshButton.alpha = 1
@@ -220,8 +252,8 @@ class GameViewController: UIViewController {
         }
     }
     
-    /// pops word search view and either populates chars for the first time or reloads them
-    fileprivate func reloadWordSearch(first: Bool){
+    ///Pops word search view and either populates chars for the first time or reloads them
+    private func reloadWordSearch(first: Bool){
         UIView.animate(withDuration: 0.2, animations: {
             self.wordSearchView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
             if first {
@@ -246,22 +278,28 @@ class GameViewController: UIViewController {
     }
     
     //MARK: Event Handlers
-    /// handler for refresh button, reloads the words search
+    
+    ///Handler for refresh button, reloads the words search
     @objc fileprivate func refreshPressed(_ sender: UIButton?){
         reloadWordSearch(first: false)
     }
     
+    ///Handler for home button, dismiss the GameViewController
     @objc fileprivate func homePressed(_ sender: UIButton?){
         self.dismiss(animated: true, completion: nil)
     }
     
+    ///Handler for orientation change notifications, updates the constraints
     @objc fileprivate func orientationChanged(){
         updateConstraints()
     }
     
-    fileprivate func endGame(){
-        delegate?.stopPlaying()
+    ///Initiates end game state
+    private func endGame(){
+        soundDelegate?.stopPlaying()
         player.play()
+        
+        //show end game view modal
         let endView = EndGameView()
         endView.delegate = self
         view.addSubview(endView)
@@ -282,21 +320,26 @@ class GameViewController: UIViewController {
 
 extension GameViewController: WordSearchViewDelegate {
     func foundWord(word: Word) {
+        //update words found label and remove option from selector view
         wordsFound += 1
         wordSelectorView.removeWordFromSelection(word: word)
     }
     
     func updateWords(words: [Word]) {
+        //new words from WordSearchView
         self.words = words
     }
 }
 
 extension GameViewController: EndGameViewDelegate {
     func closeView(_ sender: EndGameView) {
+        //stop end game sound, start sound delegate sound, remove end game modal, reload word search
         player.stop()
         player.currentTime = 0
-        delegate?.startPlaying()
         player.prepareToPlay()
+        
+        soundDelegate?.startPlaying()
+        
         sender.removeFromSuperview()
         reloadWordSearch(first: false)
     }

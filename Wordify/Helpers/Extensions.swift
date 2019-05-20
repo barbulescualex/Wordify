@@ -24,6 +24,7 @@ extension UIGestureRecognizer {
     }
 }
 
+//overkill for resizing and rotating optional UIImages
 extension Optional where Wrapped == UIImage {
     func rotate(radians: Float) -> UIImage? {
         guard let self = self else {return nil}

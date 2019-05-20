@@ -1,5 +1,5 @@
 //
-//  SelectorCell.swift
+//  WordCell.swift
 //  Wordify
 //
 //  Created by Alex Barbulescu on 2019-05-14.
@@ -8,14 +8,24 @@
 
 import UIKit
 
-class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
+///CollectionViewCell for the WordSelectorView
+class WordCell: UICollectionViewCell, UIGestureRecognizerDelegate {
+    //MARK: Vars
+    
+    ///Word held by the cell
     public var word : Word? {
         didSet{
             label.text = word?.string
         }
     }
     
-    let label : UILabel = {
+    ///Flag to check if the cell is in focus
+    private var inFocus = false
+    
+    //MARK: View Components
+    
+    ///Label to display word string
+    private var label : UILabel = {
         let label = UILabel()
         label.textColor = UIColor.gray
         label.textAlignment = .center
@@ -26,6 +36,8 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         return label
     }()
     
+    //MARK: Init
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -35,10 +47,12 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate func setup(){
-        
+    //MARK: Setup
+    private func setup(){
+        //properties
         layer.cornerRadius = 10
-
+        
+        //subvies and constraints
         addSubview(label)
         NSLayoutConstraint.activate([
             label.topAnchor.constraint(equalTo: topAnchor),
@@ -47,6 +61,7 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             label.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
         
+        //pan gesture recognizer to initiate reveal
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panned(_:)))
         pan.maximumNumberOfTouches = 1
         pan.delegate = self
@@ -54,14 +69,9 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         addGestureRecognizer(pan)
     }
     
-    @objc func panned(_ sender: UIPanGestureRecognizer){
-        if sender.state == .began {
-            sender.cancel()
-            animate()
-            word?.show()
-        }
-    }
+    ///MARK: Functions
     
+    ///animate if cell is swiped
     private func animate(){
         UIView.animate(withDuration: 0.3, animations: {
             self.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
@@ -74,15 +84,28 @@ class SelectorCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         }
     }
     
+    ///Set cell in focus
     public func setInFocus(){
+        if inFocus { return }
+        inFocus = true
         label.font = UIFont.systemFont(ofSize: 22)
     }
     
+    ///Remove focus from cell
     public func removeFocus(){
+        if !inFocus { return }
+        inFocus = false
         label.font = UIFont.systemFont(ofSize: 17)
     }
     
-    deinit {
-        print("Deinit")
+    //MARK: Event Handlers
+    
+    ///Detect swipe on cell
+    @objc func panned(_ sender: UIPanGestureRecognizer){
+        if sender.state == .began {
+            sender.cancel()
+            animate()
+            word?.show() //reveal word in WordSearchView
+        }
     }
 }

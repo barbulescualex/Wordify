@@ -11,25 +11,38 @@ import AVFoundation
 
 class HomeViewController: UIViewController {
     //MARK: Vars
+    
+    ///Loops background soundtrack
     private var player = AVAudioPlayer()
+    
+    ///Flag to distinguish if the viewDidAppear animation should occur coming back from the GameViewController
     private var firstLoad = true
+    
+    ///Gives tactile feedback for the slider
     private var sliderFeedbackGenerator : UIImpactFeedbackGenerator?
     
+    ///Holds value for how big the grid should be in the GameViewController
     private var gridSize = 10 {
         didSet{
+            //update gride size label
             gridSizeLabel.text = "\(gridSize)x\(gridSize) Grid"
             sliderFeedbackGenerator?.impactOccurred()
             
+            //update emoji view
             let emojiIndex = gridSize - 10
             emojiView.text = emojis[emojiIndex]
         }
     }
     
+    ///The emoji options based on the grid  size
     private var emojis = ["👶","😎","💪","🔥","😈","💀"]
     
+    ///Reference to the constraints for the title stack
     private var titleStackConstraints = [NSLayoutConstraint]()
     
     //MARK: View Components
+    
+    ///Holds char cells spelling out the app's name
     private var titleStack : UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -45,6 +58,7 @@ class HomeViewController: UIViewController {
         return stack
     }()
     
+    ///Button to start the game
     private lazy var playButton: UIButton = {
         let button = UIButton()
         let attributes = [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 25), NSAttributedString.Key.foregroundColor : UIColor.offWhite]
@@ -59,6 +73,7 @@ class HomeViewController: UIViewController {
         return button
     }()
     
+    ///Grid size slider
     private lazy var slider: UISlider = {
         let slider = UISlider()
         slider.minimumValue = 0
@@ -71,6 +86,7 @@ class HomeViewController: UIViewController {
         return slider
     }()
     
+    ///Grid size label
     private var gridSizeLabel: UILabel = {
         let label = UILabel()
         label.text = "10x10 Grid"
@@ -83,6 +99,7 @@ class HomeViewController: UIViewController {
         return label
     }()
     
+    ///Emoji view
     private var emojiView: UILabel = {
         let label = UILabel()
         label.text = "👶"
@@ -103,7 +120,7 @@ class HomeViewController: UIViewController {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented in HomeViewController")
     }
     
     //MARK: Lifecycle Functions
@@ -114,6 +131,7 @@ class HomeViewController: UIViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        //reset alphas for re-animation upon view did appear
         playButton.alpha = 0
         slider.alpha = 0
         gridSizeLabel.alpha = 0
@@ -123,23 +141,28 @@ class HomeViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if firstLoad {
+        if firstLoad { //app just loaded up, already executed splash screen animation
             firstLoad = false
-        } else {
+        } else { //fade everyhing back in
             viewDidAppearAnimation()
         }
     }
     
     //MARK: Setup
-    fileprivate func setup(){
+    
+    ///Sets up the view with constraints
+    private func setup(){
+        //properties
         view.backgroundColor = UIColor.offWhite
         
+        //add subviews
         view.addSubview(titleStack)
         view.addSubview(playButton)
         view.addSubview(slider)
         view.addSubview(gridSizeLabel)
         view.addSubview(emojiView)
         
+        //constraints
         NSLayoutConstraint.activate([
             playButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             playButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
@@ -165,11 +188,13 @@ class HomeViewController: UIViewController {
         
         NSLayoutConstraint.activate(titleStackConstraints)
         
+        //prepare slider feedback generator
         sliderFeedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
         sliderFeedbackGenerator?.prepare()
     }
     
-    fileprivate func setupPlayer(){
+    ///Initiates the audio player with soundtrack and starts it on infinite loop
+    private func setupPlayer(){
         guard let url = Bundle.main.url(forResource: "buddy", withExtension: "mp3") else {return}
         do {
             player = try AVAudioPlayer(contentsOf: url)
@@ -183,37 +208,11 @@ class HomeViewController: UIViewController {
     }
     
     //MARK: Animations
-    fileprivate func animateIn(){
-        NSLayoutConstraint.deactivate(titleStackConstraints)
-        
-        titleStackConstraints = [
-            titleStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            titleStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            titleStack.widthAnchor.constraint(equalToConstant: 245),
-            titleStack.heightAnchor.constraint(equalToConstant: 35),
-        ]
-        NSLayoutConstraint.activate(self.titleStackConstraints)
-        
-        for view in self.titleStack.arrangedSubviews {
-            guard let cell = view as? CharCell else {continue}
-            cell.fontSize = 30
-        }
-        
-        UIView.animate(withDuration: 0.4, animations:  {
-            self.view.layoutIfNeeded()
-        }){ _ in
-            UIView.animate(withDuration: 0.4, animations: {
-                self.playButton.alpha = 1
-                self.slider.alpha = 1
-                self.gridSizeLabel.alpha = 1
-                self.emojiView.alpha = 1
-            })
-        }
-    }
     
-    fileprivate func animateInTitle(index: Int){
+    ///Animates title stack char cells as selected recursively, first animation to occur on viewDidLoad
+    private func animateInTitle(index: Int){
         if !titleStack.arrangedSubviews.indices.contains(index) {
-            animateIn()
+            animateIn() //base case, splash screen animation complete
             return
         }
         guard let cell = titleStack.arrangedSubviews[index] as? CharCell else {
@@ -227,7 +226,39 @@ class HomeViewController: UIViewController {
         }
     }
     
-    fileprivate func viewDidAppearAnimation(){
+    ///Moves titlestack up to top and fades rest of content in
+    private func animateIn(){
+        //update title stack sizing and position
+        NSLayoutConstraint.deactivate(titleStackConstraints)
+        
+        titleStackConstraints = [
+            titleStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            titleStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            titleStack.widthAnchor.constraint(equalToConstant: 245),
+            titleStack.heightAnchor.constraint(equalToConstant: 35),
+        ]
+        NSLayoutConstraint.activate(titleStackConstraints)
+        
+        for view in self.titleStack.arrangedSubviews {
+            guard let cell = view as? CharCell else {continue}
+            cell.fontSize = 30
+        }
+        
+        UIView.animate(withDuration: 0.4, animations:  {
+            self.view.layoutIfNeeded()
+        }){ _ in
+            //fade everything else in
+            UIView.animate(withDuration: 0.4, animations: {
+                self.playButton.alpha = 1
+                self.slider.alpha = 1
+                self.gridSizeLabel.alpha = 1
+                self.emojiView.alpha = 1
+            })
+        }
+    }
+    
+    ///fades screen content in if coming back from GameViewController
+    private func viewDidAppearAnimation(){
         UIView.animate(withDuration: 0.4, animations: {
             self.playButton.alpha = 1
             self.slider.alpha = 1
@@ -238,18 +269,21 @@ class HomeViewController: UIViewController {
     }
     
     //MARK: Event Handlers
+    
+    ///Starts the game
     @objc func play(_ sender: UIButton){
         UIView.animate(withDuration: 0.3, animations: {
             sender.backgroundColor = UIColor.green
         }) { _ in
             let gameVC = GameViewController(size: self.gridSize)
-            gameVC.delegate = self
+            gameVC.soundDelegate = self
             self.present(gameVC, animated: true, completion: {
                 sender.backgroundColor = UIColor.pink
             })
         }
     }
     
+    ///Detects slider changes and updates the grid size value
     @objc func sliderChanged(_ sender: UISlider){
         let rounded = ceil(sender.value)
         let size = Int(rounded) + 10
@@ -261,14 +295,16 @@ class HomeViewController: UIViewController {
 
 }
 
-extension HomeViewController : GameViewControllerDelegate {
+extension HomeViewController : GameViewControllerSoundDelegate {
     func stopPlaying() {
+        //stop playing and reset, another sound track is occuring
         player.stop()
         player.prepareToPlay()
         player.currentTime = 0
     }
     
     func startPlaying() {
+        //start playing soundtrack
         player.play()
     }
 

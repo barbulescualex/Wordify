@@ -9,47 +9,56 @@
 import UIKit
 import AVFoundation
 
+///Protocol to let delegate know about the changes in words
 protocol WordSearchViewDelegate: AnyObject {
+    ///Let delegate know a knew word has been found
     func foundWord(word: Word)
-    //let parent know about new words
+    ///Let delegate know about new words
     func updateWords(words: [Word])
 }
 
 class WordSearchView: UIView, UIGestureRecognizerDelegate {
     //MARK: Vars
+    
     ///size of grid
-    var size : Int = 0
+    private var size : Int = 0
     
     ///previous position of last valid highlighted char
-    var previousPos : Position?
+    private var previousPos : Position?
     
     ///direction of current highlight
-    var direction : Direction?
+    private var direction : Direction?
     
     ///array of all child char cells
-    var cellArray = [CharCell]()
+    private var cellArray = [CharCell]()
     
     ///previous detected cell as seen by pan gesture recognizer
     ///- Note: This is not necessarily the last highlighted char in the current highlight session, to check last highlighted check previousPos
-    var prevCell : CharCell?
+    private var prevCell : CharCell?
     
     ///The highlighted, valid, char cells in order of selection
-    var highlightedCells = [CharCell]()
+    private var highlightedCells = [CharCell]()
     
-    var selectionFeedBack = UISelectionFeedbackGenerator()
+    ///SelectionFeedback generator for highlighting cells
+    private var selectionFeedBack = UISelectionFeedbackGenerator()
     
-    var player = AVAudioPlayer()
+    ///Player for popping sound effect
+    private var player = AVAudioPlayer()
     
     ///Reference to all the words in the grid
-    var words = [Word](){
+    private var words = [Word](){
         didSet{
+            //let delegate know about new words
             delegate?.updateWords(words: words)
         }
     }
     
+    ///Delegate to implement WordSearchViewDelegate protocol
     weak var delegate : WordSearchViewDelegate?
     
     //MARK: View Components
+    
+    ///Parent container for all rows
     private var stackContainer : UIStackView = {
         let stackContainer = UIStackView()
         stackContainer.axis = .vertical
@@ -71,7 +80,9 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     }
     
     //MARK: Setup
-    fileprivate func setup(){
+    
+    //Sets up view
+    private func setup(){
         //properties
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = UIColor.offWhite
@@ -95,7 +106,8 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         selectionFeedBack.prepare()
     }
     
-    fileprivate func setupPlayer(){
+    ///Instantiates and prepares player for found word sound
+    private func setupPlayer(){
         guard let url = Bundle.main.url(forResource: "selection", withExtension: "mp3") else {return}
         do {
             player = try AVAudioPlayer(contentsOf: url)
@@ -130,10 +142,11 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
                 horCharStack.addArrangedSubview(charView)
             }
         }
+        ///populate the cell arays, returns words
         words = Grid().populateGrid(sideLength: size, wordSet: Data.words, cellArray: cellArray)
     }
     
-    ///deletes all chars and view componenets of grid
+    ///deletes all chars and view componenets of grid, not used
     public func deleteChars(){
         for cell in self.cellArray {
             cell.removeFromSuperview()
@@ -143,8 +156,8 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
             substack.removeFromSuperview()
         }
         
-        cellArray = []
-        highlightedCells = []
+        cellArray.removeAll()
+        highlightedCells.removeAll()
     }
     
     ///reloads the word search
@@ -156,7 +169,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     }
 
 
-    ///Pan gesture detector
+    ///Pan gesture detector, will handle the highlighting of cells
     @objc func panned(_ sender: UIPanGestureRecognizer){
         let loc = sender.location(in: self)
 
@@ -171,10 +184,12 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
         
         switch sender.state {
             case .began:
+                //figure out the direction
                 calculateDirection(sender)
+                //highlight first cell
                 _ = updateHighlightForCell(cell)
             case .changed:
-                if cell != prevCell {
+                if cell != prevCell { //don't waste updateHighlight's time if its the same cell
                     updateHighlightForCell(cell)
                 }
             case .ended:
@@ -189,7 +204,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     }
     
     ///Estimates direction that the highlight is in, updates direction property
-    fileprivate func calculateDirection(_ sender: UIPanGestureRecognizer){
+    private func calculateDirection(_ sender: UIPanGestureRecognizer){
         let v = sender.velocity(in: self)
         
         //check diagonal
@@ -213,7 +228,7 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
     }
     
     ///Checks the highlightedChars array to see if it forms a valid word
-    fileprivate func checkForWord(){
+    private func checkForWord(){
         let charArray = highlightedCells.map({$0.char!})
         let candidateWord = String(charArray)
         let reversedCandidateWord = String(candidateWord.reversed())
@@ -235,24 +250,15 @@ class WordSearchView: UIView, UIGestureRecognizerDelegate {
             }
         }
         
+        //reset everything
         prevCell = nil
         highlightedCells = []
         previousPos = nil
     }
     
-    ///Resets the current highlight false
-    fileprivate func cancelHighlight(){
-        for cell in highlightedCells {
-            cell.removeHighlight()
-        }
-        highlightedCells = []
-        prevCell = nil
-        previousPos = nil
-    }
-    
-    ///Gets called from the pan gesture recognizer if a new cell was selected, this function
-    ///simply validates if the direction and sequence is correct. If the candidate cell is correct
-    ///its state will be changed to highlighted
+    /**Gets called from the pan gesture recognizer if a new cell was selected, this function
+    simply validates if the direction and sequence is correct. If the candidate cell is correct
+    its state will be changed to highlighted*/
     fileprivate func updateHighlightForCell(_ cell: CharCell){
         //checking for overlap
         if highlightedCells.contains(cell){
