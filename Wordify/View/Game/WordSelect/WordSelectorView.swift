@@ -29,6 +29,9 @@ class WordSelectorView: UIView {
         didSet{
             if words.count == 0 {return} //nothing to do
             
+            //Scroll collectionView to new cell in focus
+            collectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
+            
             //remove focus
             for cell in collectionView.visibleCells {
                 guard let cell = cell as? WordCell else {continue}
@@ -38,9 +41,6 @@ class WordSelectorView: UIView {
             //set new cell at indexPath in focus
             guard let cell = collectionView.cellForItem(at: indexPath) as? WordCell else {return}
             cell.setInFocus()
-            
-            //Scroll collectionView to new cell in focus
-            collectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
         }
     }
     
@@ -163,7 +163,6 @@ class WordSelectorView: UIView {
         @unknown default:
             print("unkown default in word selector view update word selector view")
         }
-        collectionView.reloadData()
         indexPath.item = 0
     }
     

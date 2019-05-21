@@ -50,6 +50,14 @@ class GameViewController: UIViewController {
             wordCountLabel.text = "\(wordsFound)/\(words.count)"
             //update words in word selector view
             wordSelectorView.words = words
+            isRefreshing = false
+        }
+    }
+    
+    ///Flag to stop hecklers from spamming the refresh button
+    private var isRefreshing = false {
+        didSet{
+            refreshButton.isEnabled = !isRefreshing
         }
     }
     
@@ -111,7 +119,6 @@ class GameViewController: UIViewController {
     required init(size: Int){
         self.size = size
         super.init(nibName: nil, bundle: nil)
-        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         setupPlayer()
     }
     
@@ -144,9 +151,6 @@ class GameViewController: UIViewController {
         view.addSubview(refreshButton)
         view.addSubview(wordSelectorView)
         view.addSubview(wordSearchView)
-        
-        //notifications
-        NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     ///Sets initial constraints
@@ -167,18 +171,25 @@ class GameViewController: UIViewController {
             wordSearchView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
         
-        updateConstraints()
+        updateConstraints(toSize: view.frame.size)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.updateConstraints(toSize: size)
+        }
     }
     
     ///Updates constraints based on orientation
-    private func updateConstraints(){
+    private func updateConstraints(toSize size: CGSize){
         //clear previous
         wordSearchViewWidthAnchor?.isActive = false
         NSLayoutConstraint.deactivate(wordSelectorViewConstraints)
         NSLayoutConstraint.deactivate(wordsFoundViewConstraints)
         
         //update new
-        if (view.frame.height > view.frame.width) { //portrait
+        if (size.height > size.width) { //portrait
             //activate new
             wordSearchViewWidthAnchor = wordSearchView.widthAnchor.constraint(equalToConstant: self.view.frame.width)
             wordSearchViewWidthAnchor?.isActive = true
@@ -225,6 +236,9 @@ class GameViewController: UIViewController {
             
             //Update word selector view orientation state
             wordSelectorView.updateOrientation(direction: .vertical)
+        }
+        UIView.animate(withDuration: 0.2) {
+            self.view.layoutIfNeeded()
         }
     }
     
@@ -281,17 +295,13 @@ class GameViewController: UIViewController {
     
     ///Handler for refresh button, reloads the words search
     @objc fileprivate func refreshPressed(_ sender: UIButton?){
+        isRefreshing = true
         reloadWordSearch(first: false)
     }
     
     ///Handler for home button, dismiss the GameViewController
     @objc fileprivate func homePressed(_ sender: UIButton?){
         self.dismiss(animated: true, completion: nil)
-    }
-    
-    ///Handler for orientation change notifications, updates the constraints
-    @objc fileprivate func orientationChanged(){
-        updateConstraints()
     }
     
     ///Initiates end game state
@@ -309,11 +319,6 @@ class GameViewController: UIViewController {
             endView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             endView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
-    }
-    
-    //MARK: Deinit
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
 
 }
