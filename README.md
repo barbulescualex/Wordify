@@ -17,7 +17,6 @@ Fall 2019 Shopify iOS Internship Application
 
 
 ## Screenshots
-____
 
 ![logo](images/0.png)
 ![logo](images/1.png)
@@ -27,6 +26,5 @@ ____
 ![logo](images/landscapeDemo.png)
 
 ## Video
-____
 
 [youtube](https://www.youtube.com/watch?v=EUCE61Oeonw)
