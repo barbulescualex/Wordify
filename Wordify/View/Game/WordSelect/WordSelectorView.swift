@@ -31,6 +31,7 @@ class WordSelectorView: UIView {
             
             //Scroll collectionView to new cell in focus
             collectionView.scrollToItem(at: indexPath, at: [.centeredVertically, .centeredHorizontally], animated: true)
+            canMove = false
             
             //remove focus
             for cell in collectionView.visibleCells {
@@ -41,6 +42,22 @@ class WordSelectorView: UIView {
             //set new cell at indexPath in focus
             guard let cell = collectionView.cellForItem(at: indexPath) as? WordCell else {return}
             cell.setInFocus()
+        }
+    }
+    
+    /*Flag to stop the move buttons from being spammed.
+    - NOTE: This is a drawback on my decision to implement the functionality using a collection view. If you scroll
+            fast enough, the collectionView might not have the cell you're trying to get and will never set the cell
+            in focus. This implementation fixes it at the cost of didSet being called twice, but hey its better then
+            nothing I guess ;)
+    **/
+    private var canMove = true {
+        didSet{
+            if !canMove {
+                DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.15) {
+                    self.canMove = true
+                }
+            }
         }
     }
     
@@ -105,6 +122,7 @@ class WordSelectorView: UIView {
         collectionView.register(WordCell.self, forCellWithReuseIdentifier: id)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.isScrollEnabled = false
+        collectionView.remembersLastFocusedIndexPath = true
         return collectionView
     }()
 
@@ -170,6 +188,7 @@ class WordSelectorView: UIView {
     
     ///Back button handler, scrolls the collection view back
     @objc private func back(_ sender: UIButton){
+        if !canMove { return }
         let newIndex = indexPath.item - 1
         if newIndex < 0 {return}
         indexPath.item = newIndex
@@ -177,6 +196,7 @@ class WordSelectorView: UIView {
     
     ///Forward button handler, scrolls the collection view forward
     @objc private func forward(_ sender: UIButton){
+        if !canMove { return }
         let newIndex = indexPath.item + 1
         if newIndex > words.count-1 {return}
         indexPath.item = newIndex
@@ -196,7 +216,7 @@ extension WordSelectorView: UICollectionViewDelegate, UICollectionViewDataSource
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! WordCell
         cell.word = words[indexPath.item]
-        if indexPath.item == 0 && self.indexPath.item == 0 {
+        if self.indexPath == indexPath {
             cell.setInFocus()
         } else {
             cell.removeFocus()
